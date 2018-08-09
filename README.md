@@ -16,7 +16,7 @@ A *map* is a an arrangement of *tiles*
 Two given tiles are considered *adjacent* if they are directly vertically or horizontally next to each other. If they touch with their corners they do not count as *adjacent*.  
 
 #### Tasks
-* Implement an API-only Spring Boot application. *(I will use [ktor]() instead)*
+* Implement an API-only Spring Boot application. *(I will use [Ktor](https://github.com/ktorio/ktor) instead)*
 * You can use any database of your choice. *(I will use mongodb)*
 * You can use any libs you like.
 * Use a local git repository and send us a tarball archive with your solution by email.

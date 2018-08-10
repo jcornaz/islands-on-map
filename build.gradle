@@ -7,8 +7,17 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib"
+
+    testCompile "org.junit.jupiter:junit-jupiter-api:$junit_version"
+    testCompile "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+    testCompile 'org.amshove.kluent:kluent:1.40'
+}
+
+test {
+    useJUnitPlatform()
 }

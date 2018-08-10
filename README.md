@@ -1,5 +1,5 @@
 # Islands on a map
-[Thanos Psaridis](https://github.com/ThanosFisherman) kindly published his work for an assessment he did when applying for a position in switzerland: https://github.com/ThanosFisherman/Advanon-SpringBoot-Task
+[Thanos Psaridis](https://github.com/ThanosFisherman) kindly published his work for an assessment he did when applying for a position: https://github.com/ThanosFisherman/islands-on-map
 
 I found this interesting and decided to do the same task from scratch as a small personal exercise.
 

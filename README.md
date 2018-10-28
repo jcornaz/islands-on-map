@@ -65,7 +65,7 @@ Here's a result example:
 
 #### Tasks
 * Implement an API-only Spring Boot application. *(I will use [Ktor](https://github.com/ktorio/ktor) instead)*
-* You can use any database of your choice. *(I will use mongodb)*
+* You can use any database of your choice. *(I won't use any)*
 * You can use any libs you like.
 * Use a local git repository and send us a tarball archive with your solution by email.
 * Don't put your solution on a publicly accessible repository.

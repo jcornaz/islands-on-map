@@ -1,31 +1,28 @@
 package com.github.jcornaz.islands.domain
 
-fun TileMap.detectIslands(): Collection<Island> {
-  val map = this
-  val seenCoordinates = hashSetOf<Coordinate>()
+import kotlinx.coroutines.experimental.channels.*
 
-  fun Coordinate.appendTo(island: MutableSet<Coordinate>) {
-    if (this in seenCoordinates) return
+fun detectIslands(map: TileMap): ReceiveChannel<Set<Coordinate>> = produce(capacity = Channel.UNLIMITED) {
+    val seenCoordinates = hashSetOf<Coordinate>()
 
-    island += this
-    seenCoordinates += this
+    fun Coordinate.appendTo(island: MutableSet<Coordinate>) {
+        if (this in seenCoordinates) return
 
-    sequenceOf(up, down, left, right)
-      .mapNotNull { map[it] }
-      .filter { it.isLand }
-      .forEach { it.coordinate.appendTo(island) }
-  }
+        island += this
+        seenCoordinates += this
 
-  val result = mutableSetOf<Island>()
+        sequenceOf(up, down, left, right)
+                .mapNotNull { map[it] }
+                .filter { it.isLand }
+                .forEach { it.coordinate.appendTo(island) }
+    }
 
-  values.filter { it.isLand }.forEach { tile ->
-    if (tile.coordinate in seenCoordinates) return@forEach
+    map.values.filter { it.isLand }.forEach { tile ->
+        if (tile.coordinate in seenCoordinates) return@forEach
 
-    val coordinates = hashSetOf<Coordinate>()
-      .also { tile.coordinate.appendTo(it) }
+        val coordinates = hashSetOf<Coordinate>()
+                .also { tile.coordinate.appendTo(it) }
 
-    result += Island(coordinates)
-  }
-
-  return result
+        send(coordinates)
+    }
 }

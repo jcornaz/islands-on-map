@@ -3,15 +3,15 @@
 
 I found this interesting and decided to do the same task from scratch as a small personal exercise.
 
-However, as I'm not applying for the job position, I can change the points of the tasks I don't like. For instance I'll go for [Ktor](https://github.com/ktorio/ktor) instead of SpringBoot, and I'll not provide the endpoint `POST /api/maps` because it does not respect the semantic of REST verbs IMHO.
+However, as I'm not applying for the job position, I can change the points of the tasks I don't like. For instance I'll go for [Ktor](https://github.com/ktorio/ktor) instead of SpringBoot.
 
 ### Assignment
 #### Concept
-An *island* is formed by *tiles* of type "land" which are surrounded by "water" tiles. Two tiles belong to the same island if they touch.
+A *map* is a a collection of *tiles*
 
-A *map* is a an collection of *tiles*
+An *island* is formed by *tiles* of type "land" which are surrounded by "water" tiles. Two tiles of type "land" belong to the same island if they are *adjacent*.
 
-Two given tiles are considered *adjacent* if they are directly vertically or horizontally next to each other. If they touch with their corners they do not count as *adjacent*.  
+Two given tiles are considered *adjacent* if they are directly vertically or horizontally next to each other. If they touch with their corners they are not *adjacent*.
 
 #### Provided endpoint
 https://private-2e8649-advapi.apiary-mock.com/map shall be called to get a map.
@@ -64,18 +64,19 @@ Here's a result example:
 ```
 
 #### Tasks
-* Implement an API-only Spring Boot application. *(I will use [Ktor](https://github.com/ktorio/ktor) instead)*
-* You can use any database of your choice. *(I won't use any)*
-* You can use any library you like.
+* Implement an API-only Spring Boot application. *(I use [Ktor](https://github.com/ktorio/ktor) instead)*
+* You can use any database of your choice. *(I will use mongodb)*
+* You can use any library you like. *(I use many ktor artifacts, gson, koin, slf4j-simple, kotlinx.coroutines, junit5, mockito and kluent)*
   
 ##### Bonus tasks
-  * Provide a Dockerfile which allows to run your app. *(This is over-engineering for an app which only needs `gradlew run`, I find more interesting to actually deploy the app in cloud)*
+  * Provide a Dockerfile which allows to run your app.
   * Add an API endpoint that returns the map in ASCII style. Output could be something like:
   ```
   #---x-- 
   #--xxx- 
   #----x-
   ```
+  * *It wasn't asked, but I find interesting to actually deploy the app in cloud*
 
 #### Endpoints to provide
 
@@ -85,8 +86,8 @@ Here's a result example:
     * The given "Map" and the "Tiles" that belong to the map 
     * The islands that can be detected on the map with related tiles 
     * An island should belong to a map
-  * *This is against rest verbs semantic IMHO. A `POST` request should create the entity which has been given in the post arguments. So I decided to not provide this endpoint. Instead my service will initialize its database by fetching  https://private-2e8649-advapi.apiary-mock.com/map at startup*.
+  * *This is against rest verbs semantic IMHO. I will require the map URL to be to be given as a post argument.*
 * `GET /api/islands`
-  * Should retrieve all islands with the tiles that belong to them
+  * Should retrieve all islands with the tiles that belong to them.
 * `GET /api/islands/:id`
-  * Should retrieve just one island with the matching id. Also including related tiles
+  * Should retrieve just one island with the matching id. Also including related tiles.

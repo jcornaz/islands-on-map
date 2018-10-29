@@ -5,9 +5,8 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockHttpResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.experimental.channels.toList
-import kotlinx.coroutines.experimental.runBlocking
-import org.amshove.kluent.shouldThrow
+import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails

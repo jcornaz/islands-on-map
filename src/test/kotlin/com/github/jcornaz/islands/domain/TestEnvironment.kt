@@ -7,7 +7,7 @@ import io.ktor.client.engine.mock.MockHttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import kotlinx.coroutines.experimental.io.ByteReadChannel
+import kotlinx.coroutines.io.ByteReadChannel
 import org.koin.dsl.module.module
 
 private const val expectedRemoteAnswer = """
@@ -56,7 +56,8 @@ private const val expectedRemoteAnswer = """
 }
 """
 
-internal fun Tile(x: Int, y: Int, type: TileType) = Tile(Coordinate(x, y), type)
+@Suppress("TestFunctionName")
+fun Tile(x: Int, y: Int, type: TileType) = Tile(Coordinate(x, y), type)
 
 val expectedTiles = listOf(
     Tile(1, 1, TileType.LAND),

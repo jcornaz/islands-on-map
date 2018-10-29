@@ -6,22 +6,22 @@ import com.github.jcornaz.islands.domain.TileType
 import com.github.jcornaz.islands.persistence.TileRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.features.json.GsonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.get
-import kotlinx.coroutines.experimental.channels.Channel
-import kotlinx.coroutines.experimental.channels.ReceiveChannel
-import kotlinx.coroutines.experimental.channels.produce
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
+import kotlin.coroutines.CoroutineContext
 
 private const val URL = "https://private-2e8649-advapi.apiary-mock.com/map"
 
-class RemoteTileRepository(engine: HttpClientEngine) : TileRepository {
+class RemoteTileRepository(engine: HttpClientEngine) : TileRepository, CoroutineScope {
+    override val coroutineContext: CoroutineContext get() = Dispatchers.Default
 
     private val client = HttpClient(engine) {
-        install(JsonFeature) {
-            serializer = GsonSerializer()
-        }
+        install(JsonFeature)
     }
 
     override fun findAll(): ReceiveChannel<Tile> = produce(capacity = Channel.UNLIMITED) {

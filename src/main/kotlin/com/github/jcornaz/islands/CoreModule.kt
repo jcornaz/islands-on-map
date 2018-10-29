@@ -13,7 +13,7 @@ import io.ktor.gson.gson
 import io.ktor.response.respond
 import io.ktor.routing.get
 import io.ktor.routing.routing
-import kotlinx.coroutines.experimental.channels.toList
+import kotlinx.coroutines.channels.toList
 import org.koin.dsl.module.module
 import org.koin.ktor.ext.get
 

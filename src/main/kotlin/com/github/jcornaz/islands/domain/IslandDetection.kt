@@ -1,10 +1,14 @@
 package com.github.jcornaz.islands.domain
 
-import kotlinx.coroutines.experimental.channels.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
 
-fun detectIslands(map: TileMap): ReceiveChannel<Set<Coordinate>> = produce(capacity = Channel.UNLIMITED) {
+fun detectIslands(map: TileMap): ReceiveChannel<Set<Coordinate>> = GlobalScope.produce(capacity = Channel.UNLIMITED) {
     val seenCoordinates = hashSetOf<Coordinate>()
 
+    @Suppress("unused")
     fun Coordinate.appendTo(island: MutableSet<Coordinate>) {
         if (this in seenCoordinates) return
 

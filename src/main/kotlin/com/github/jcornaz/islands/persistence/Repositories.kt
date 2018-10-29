@@ -5,7 +5,9 @@ import com.github.jcornaz.islands.domain.Tile
 import com.github.jcornaz.islands.domain.detectIslands
 import com.github.jcornaz.islands.persistence.impl.InMemoryIslandRepository
 import com.github.jcornaz.islands.persistence.impl.RemoteTileRepository
-import kotlinx.coroutines.experimental.channels.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.*
 import org.koin.dsl.module.module
 
 interface TileRepository {
@@ -21,7 +23,7 @@ val persistenceModule = module {
     single<IslandRepository> { InMemoryIslandRepository { get<TileRepository>().findAll().createIslands().toList() } }
 }
 
-private fun ReceiveChannel<Tile>.createIslands(): ReceiveChannel<Island> = produce {
+private fun ReceiveChannel<Tile>.createIslands(): ReceiveChannel<Island> = GlobalScope.produce(Dispatchers.Unconfined) {
     val map = associateBy { it.coordinate }
 
     var count = 0

@@ -1,7 +1,7 @@
 package com.github.jcornaz.islands.domain
 
-import kotlinx.coroutines.experimental.channels.toList
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.runBlocking
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldEqual

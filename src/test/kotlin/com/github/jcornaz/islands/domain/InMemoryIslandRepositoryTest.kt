@@ -1,10 +1,10 @@
 package com.github.jcornaz.islands.domain
 
 import com.github.jcornaz.islands.persistence.impl.InMemoryIslandRepository
-import kotlinx.coroutines.experimental.channels.map
-import kotlinx.coroutines.experimental.channels.toList
-import kotlinx.coroutines.experimental.channels.toSet
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.channels.map
+import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.channels.toSet
+import kotlinx.coroutines.runBlocking
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldEqual
 import org.junit.jupiter.api.Test

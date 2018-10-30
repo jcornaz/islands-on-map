@@ -86,8 +86,16 @@ Here's a result example:
     * The given "Map" and the "Tiles" that belong to the map 
     * The islands that can be detected on the map with related tiles 
     * An island should belong to a map
-  * *This is against rest verbs semantic IMHO. I will require the map URL to be to be given as a post argument.*
+  * *This specification is against rest verbs semantic IMHO. My implementation won't fetch any predefined URl, but require the map to be given as a json argument of the post request.*
 * `GET /api/islands`
   * Should retrieve all islands with the tiles that belong to them.
 * `GET /api/islands/:id`
   * Should retrieve just one island with the matching id. Also including related tiles.
+
+
+*Since I changed the specification of `POST /api/maps`, I'll also provide the following endpoints to make it simpler to fill the database*
+  * `POST /api/maps/fetch-requests`
+    * Create a request for the server to fetch an URL and create map returned by the URL.
+    * Returns the request ID
+  * `GEt /api/maps/fetch-requests/:id`
+    * Returns the state of the given request (pending, success or failed)

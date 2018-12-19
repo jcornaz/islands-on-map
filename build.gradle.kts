@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.3.11"
+    kotlin("jvm") version Version.KOTLIN
+    id("com.github.ben-manes.versions") version "0.20.0"
 }
 
 group = "com.github.jcornaz"
@@ -42,7 +43,7 @@ tasks {
 }
 
 dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Version.KOTLIN}")
 
     compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Version.COROUTINES}")
 
@@ -62,7 +63,7 @@ dependencies {
     testCompile("org.amshove.kluent:kluent:${Version.KLUENT}")
 
     testCompile("io.ktor:ktor-server-test-host:${Version.KTOR}")
-    testCompile("io.ktor:ktor-client-mock:${Version.KTOR}")
+    testCompile("io.ktor:ktor-client-mock-jvm:${Version.KTOR}")
 
     testCompile("org.koin:koin-test:${Version.KOIN}")
 }

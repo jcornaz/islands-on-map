@@ -8,7 +8,7 @@ import com.github.jcornaz.islands.persistence.impl.RemoteTileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.*
-import org.koin.dsl.module.module
+import org.koin.dsl.module
 
 interface TileRepository {
     fun findAll(): ReceiveChannel<Tile>

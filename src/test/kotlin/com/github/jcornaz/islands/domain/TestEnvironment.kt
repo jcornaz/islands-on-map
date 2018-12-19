@@ -8,7 +8,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.io.ByteReadChannel
-import org.koin.dsl.module.module
+import org.koin.dsl.module
 
 private const val expectedRemoteAnswer = """
 {

@@ -12,13 +12,9 @@ data class Coordinate(val x: Int, val y: Int) {
 
 enum class TileType { WATER, LAND }
 
-data class Tile(val coordinate: Coordinate, val type: TileType) {
-    val isLand: Boolean get() = type == TileType.LAND
-}
+data class Tile(val coordinate: Coordinate, val type: TileType)
 
 data class Island(val id: Int, val coordinates: Set<Coordinate>)
 
-typealias TileMap = Map<Coordinate, Tile>
-
-fun Collection<Tile>.toTileMap(): TileMap =
-        associate { it.coordinate to it }
+fun Iterable<Tile>.toTileMap(): Map<Coordinate, TileType> =
+        associate { it.coordinate to it.type }

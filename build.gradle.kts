@@ -1,3 +1,5 @@
+import groovy.lang.Closure
+
 plugins {
     kotlin("jvm") version Version.KOTLIN
     id("com.github.ben-manes.versions") version "0.20.0"
@@ -38,12 +40,17 @@ tasks {
     }
 
     test {
-        useJUnitPlatform()
+
+        @Suppress("UnstableApiUsage")
+        useJUnitPlatform {
+            includeEngines("spek2")
+        }
     }
 }
 
 dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Version.KOTLIN}")
+    testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:${Version.KOTLIN}")
 
     compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Version.COROUTINES}")
 
@@ -52,18 +59,17 @@ dependencies {
     compile("io.ktor:ktor-client-core:${Version.KTOR}")
     compile("io.ktor:ktor-client-gson:${Version.KTOR}")
     compile("io.ktor:ktor-client-apache:${Version.KTOR}")
-
-    compile("org.koin:koin-ktor:${Version.KOIN}")
-    compile("org.koin:koin-logger-slf4j:${Version.KOIN}")
-
-    compile("org.slf4j:slf4j-simple:${Version.SLF4J_SIMPLE}")
-
-    testCompile("org.junit.jupiter:junit-jupiter-api:${Version.JUNIT}")
-    testCompile("org.junit.jupiter:junit-jupiter-engine:${Version.JUNIT}")
-    testCompile("org.amshove.kluent:kluent:${Version.KLUENT}")
-
     testCompile("io.ktor:ktor-server-test-host:${Version.KTOR}")
     testCompile("io.ktor:ktor-client-mock-jvm:${Version.KTOR}")
 
+    compile("org.koin:koin-ktor:${Version.KOIN}")
+    compile("org.koin:koin-logger-slf4j:${Version.KOIN}")
     testCompile("org.koin:koin-test:${Version.KOIN}")
+
+    compile("org.slf4j:slf4j-simple:${Version.SLF4J_SIMPLE}")
+
+    testCompile("org.spekframework.spek2:spek-dsl-jvm:${Version.SPEK}")
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:${Version.SPEK}")
+
+    testCompile("org.amshove.kluent:kluent:${Version.KLUENT}")
 }

@@ -1,16 +1,6 @@
 package com.github.jcornaz.islands.domain
 
-import com.github.jcornaz.islands.persistence.persistenceModule
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.MockHttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.headersOf
-import kotlinx.coroutines.io.ByteReadChannel
-import org.koin.dsl.module
-
-private const val expectedRemoteAnswer = """
+const val expectedRemoteAnswer = """
 {
     "data": {
         "id": "imaginary",
@@ -91,19 +81,3 @@ val expectedTiles = listOf(
     Tile(5, 5, TileType.WATER),
     Tile(6, 5, TileType.WATER)
 )
-
-/**
- * Always returns [expectedRemoteAnswer]
- */
-val testDataMockEngine = MockEngine {
-    MockHttpResponse(
-        call,
-        HttpStatusCode.OK,
-        ByteReadChannel(expectedRemoteAnswer.toByteArray()),
-        headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
-    )
-}
-
-private val testHttpModule = module { single<HttpClientEngine> { testDataMockEngine } }
-
-val testModules = listOf(testHttpModule, persistenceModule)

@@ -1,18 +1,19 @@
 package com.github.jcornaz.islands.domain
 
 import com.github.jcornaz.islands.productionModules
-import org.junit.jupiter.api.Test
 import org.koin.dsl.koinApplication
 import org.koin.test.check.checkModules
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 
-class DependencyInjectionTest {
-
-    @Test
-    fun testDiModules() {
+class DependencyInjectionSpecification : Spek({
+    describe("Production environment") {
         val app = koinApplication {
             modules(productionModules)
         }
 
-        app.checkModules()
+        it("should run") {
+            app.checkModules()
+        }
     }
-}
+})

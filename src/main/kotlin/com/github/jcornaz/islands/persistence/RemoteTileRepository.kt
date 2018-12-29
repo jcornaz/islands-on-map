@@ -1,9 +1,8 @@
-package com.github.jcornaz.islands.persistence.impl
+package com.github.jcornaz.islands.persistence
 
-import com.github.jcornaz.islands.domain.Coordinate
-import com.github.jcornaz.islands.domain.Tile
-import com.github.jcornaz.islands.domain.TileType
-import com.github.jcornaz.islands.persistence.TileRepository
+import com.github.jcornaz.islands.Coordinate
+import com.github.jcornaz.islands.Tile
+import com.github.jcornaz.islands.TileType
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.features.json.JsonFeature
@@ -29,11 +28,16 @@ class RemoteTileRepository(engine: HttpClientEngine) : TileRepository, Coroutine
 
         answer.attributes.tiles.forEach { (x, y, type) ->
             send(
-                    Tile(Coordinate(x, y), when (type) {
-                        "land" -> TileType.LAND
-                        "water" -> TileType.WATER
-                        else -> throw Exception("Unexpected tile type: $type")
-                    })
+                Tile.newBuilder()
+                    .setCoordinate(Coordinate.newBuilder().setX(x).setY(y))
+                    .setType(
+                        when (type) {
+                            "land" -> TileType.LAND
+                            "water" -> TileType.WATER
+                            else -> TileType.UNRECOGNIZED
+                        }
+                    )
+                    .build()
             )
         }
     }

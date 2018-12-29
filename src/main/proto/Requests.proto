@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package com.github.jcornaz.islands;
+
+option java_multiple_files = true;
+
+import "Resources.proto";
+
+message CreateTileMapRequest {
+    repeated Tile tile = 1;
+}

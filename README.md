@@ -65,37 +65,41 @@ Here's a result example:
 
 #### Tasks
 * Implement an API-only Spring Boot application. *(I use [Ktor](https://github.com/ktorio/ktor) instead)*
-* You can use any database of your choice. *(I will use mongodb)*
-* You can use any library you like. *(I use many ktor artifacts, gson, koin, slf4j-simple, kotlinx.coroutines, junit5, mockito and kluent)*
+* You can use any database of your choice. *(I use Noe4J)*
+* You can use any library you like. *(I use many ktor artifacts, slf4j-simple, kotlinx.coroutines, spek and kluent)*
+* *Payload format wasn't specified by the task. I use protobuf.*
   
-##### Bonus tasks
-  * Provide a Dockerfile which allows to run your app.
-  * Add an API endpoint that returns the map in ASCII style. Output could be something like:
-  ```
-  #---x-- 
-  #--xxx- 
-  #----x-
-  ```
-  * *It wasn't asked, but I find interesting to actually deploy the app in cloud*
-
 #### Endpoints to provide
 
-* `POST /api/maps`
+* [x] `POST /api/maps`
   * Should make a GET call to https://private-2e8649-advapi.apiary-mock.com/map
     and create in the database entries for: 
     * The given "Map" and the "Tiles" that belong to the map 
     * The islands that can be detected on the map with related tiles 
     * An island should belong to a map
-  * *This specification is against rest verbs semantic IMHO. My implementation won't fetch any predefined URl, but require the map to be given as a json argument of the post request.*
-* `GET /api/islands`
+  * *This specification is against rest verbs semantic IMHO. My implementation won't fetch any predefined URl, but require the map to be given as an argument of the post request.*
+  * *For consistency, and testability I will also provide the following endpoints:*
+    * [x] *`GET /api/maps` Should retrieve all created maps*
+    * [x] *`GET /api/maps/:id` Should retrieve the map matching the given id.*
+* [ ] `GET /api/islands`
   * Should retrieve all islands with the tiles that belong to them.
-* `GET /api/islands/:id`
+* [ ] `GET /api/islands/:id`
   * Should retrieve just one island with the matching id. Also including related tiles.
 
 
 *Since I changed the specification of `POST /api/maps`, I'll also provide the following endpoints to make it simpler to fill the database*
-  * `POST /api/maps/fetch-requests`
+  * [ ] `POST /api/maps/fetch-requests`
     * Create a request for the server to fetch an URL and create map returned by the URL.
     * Returns the request ID
-  * `GEt /api/maps/fetch-requests/:id`
+  * [ ] `GEt /api/maps/fetch-requests/:id`
     * Returns the state of the given request (pending, success or failed)
+  
+##### Bonus tasks
+  * [ ] Provide a Dockerfile which allows to run your app.
+  * [ ] Add an API endpoint that returns the map in ASCII style. Output could be something like:
+  ```
+  #---x-- 
+  #--xxx- 
+  #----x-
+  ```
+  * [ ] *It wasn't asked, but I find interesting to actually deploy the app in cloud*

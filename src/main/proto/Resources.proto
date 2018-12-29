@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package com.github.jcornaz.islands;
+
+option java_multiple_files = true;
+
+message Coordinate {
+    int32 x = 1;
+    int32 y = 2;
+}
+
+enum TileType {
+    WATER = 0;
+    LAND = 1;
+}
+
+message Tile {
+    Coordinate coordinate = 1;
+    TileType type = 2;
+}
+
+message TileMap {
+    string id = 1;
+    repeated Tile tile = 2;
+}
+
+message TileMapList {
+    repeated TileMap tileMap = 1;
+}
+
+message Island {
+    string id = 2;
+    string map_id = 1;
+    repeated TileMap tileMap = 3;
+}

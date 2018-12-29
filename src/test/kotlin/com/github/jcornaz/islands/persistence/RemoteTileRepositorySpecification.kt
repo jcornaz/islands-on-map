@@ -1,4 +1,62 @@
-package com.github.jcornaz.islands.domain
+package com.github.jcornaz.islands.persistence
+
+import com.github.jcornaz.islands.*
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockHttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.io.ByteReadChannel
+import org.amshove.kluent.shouldContainSame
+import org.amshove.kluent.shouldEqualTo
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.lifecycle.CachingMode
+import org.spekframework.spek2.style.specification.describe
+
+class RemoteTileRepositorySpecification : Spek({
+
+    describe("expected data") {
+        val engine by memoizedClosable(CachingMode.SCOPE) {
+            MockEngine {
+                MockHttpResponse(
+                    call,
+                    HttpStatusCode.OK,
+                    ByteReadChannel(expectedRemoteAnswer.toByteArray()),
+                    headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
+                )
+            }
+        }
+
+        val result by memoizedBlocking(CachingMode.SCOPE) { RemoteTileRepository(engine).findAll().toList() }
+
+        it("should return ${expectedTiles.size} tiles") {
+            result.size shouldEqualTo expectedTiles.size
+        }
+
+        it("should return expected tiles") {
+            result shouldContainSame expectedTiles
+        }
+    }
+
+    group("status codes") {
+        HttpStatusCode.allStatusCodes.asSequence()
+            .filterNot { it.isSuccess() }
+            .forEach { status ->
+                describe("remote returns $status") {
+                    val engine by memoizedClosable { MockEngine { MockHttpResponse(call, status) } }
+                    val repository by memoized { RemoteTileRepository(engine) }
+
+                    it("should fail") {
+                        assertFailsBlocking<Exception> {
+                            repository.findAll().toList()
+                        }
+                    }
+                }
+            }
+    }
+})
 
 const val expectedRemoteAnswer = """
 {
@@ -46,10 +104,7 @@ const val expectedRemoteAnswer = """
 }
 """
 
-@Suppress("TestFunctionName")
-fun Tile(x: Int, y: Int, type: TileType) = Tile(Coordinate(x, y), type)
-
-val expectedTiles = listOf(
+private val expectedTiles = listOf(
     Tile(1, 1, TileType.LAND),
     Tile(2, 1, TileType.LAND),
     Tile(3, 1, TileType.WATER),

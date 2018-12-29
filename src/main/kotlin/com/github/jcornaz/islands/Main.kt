@@ -1,12 +1,11 @@
 package com.github.jcornaz.islands
 
-import com.github.jcornaz.islands.persistence.persistenceModule
+import com.github.jcornaz.islands.persistence.Neo4JTileMapRepository
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-
-val productionModules = listOf(httpModule, persistenceModule)
+import org.neo4j.driver.v1.GraphDatabase
 
 private val environment = applicationEngineEnvironment {
     connector {
@@ -14,10 +13,10 @@ private val environment = applicationEngineEnvironment {
     }
 
     module {
-        core(productionModules)
+        maps(Neo4JTileMapRepository(GraphDatabase.driver("bolt://localhost:7687")))
     }
 }
 
-fun main(args: Array<String>) {
+fun main() {
     embeddedServer(Netty, environment).start(true)
 }

@@ -1,14 +1,19 @@
 package com.github.jcornaz.islands.domain
 
+import com.github.jcornaz.islands.Coordinate
+import com.github.jcornaz.islands.TestDataSet
+import com.github.jcornaz.islands.Tile
+import com.github.jcornaz.islands.TileType
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldContainSame
 import org.amshove.kluent.shouldEqual
 import org.spekframework.spek2.Spek
+import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.style.specification.describe
 
 class DetectIslandsSpecification : Spek({
-    describe("from provided tile-set") {
-        val islands = expectedTiles.toTileMap().islands.toList()
+    describe("from provided map") {
+        val islands by memoized(CachingMode.SCOPE) { TestDataSet.providedMap.tileList.islands() }
 
         it("should return 3 islands") {
             islands.size shouldEqual 3
@@ -38,14 +43,14 @@ class DetectIslandsSpecification : Spek({
     }
 
     describe("from water tiles") {
-        val map = listOf(
+        val tiles = listOf(
             Tile(0, 0, TileType.WATER),
             Tile(0, 1, TileType.WATER),
             Tile(1, 0, TileType.WATER),
             Tile(1, 1, TileType.WATER)
-        ).toTileMap()
+        )
 
-        val islands = map.islands.toList()
+        val islands by memoized { tiles.islands() }
 
         it("should not return any island") {
             islands.shouldBeEmpty()
@@ -60,7 +65,7 @@ class DetectIslandsSpecification : Spek({
             Tile(1, 1, TileType.LAND)
         )
 
-        val islands = tiles.toTileMap().islands.toList()
+        val islands by memoized { tiles.islands() }
 
         it("should return one island") {
             islands.size shouldEqual 1
@@ -72,7 +77,7 @@ class DetectIslandsSpecification : Spek({
     }
 
     describe("from empty tile-map") {
-        val islands = emptyMap<Coordinate, TileType>().islands.toList()
+        val islands by memoized { emptyList<Tile>().islands() }
 
         it("should not return any island") {
             islands.shouldBeEmpty()
@@ -85,9 +90,9 @@ class DetectIslandsSpecification : Spek({
             Tile(0, 1, TileType.WATER),
             Tile(1, 0, TileType.WATER),
             Tile(1, 1, TileType.LAND)
-        ).toTileMap()
+        )
 
-        val islands = map.islands.toList()
+        val islands by memoized { map.islands() }
 
         it("should detect 2 islands") {
             islands.size shouldEqual 2

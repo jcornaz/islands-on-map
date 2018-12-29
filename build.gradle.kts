@@ -1,8 +1,11 @@
+import com.google.protobuf.gradle.*
 import groovy.lang.Closure
 
 plugins {
+    idea
     kotlin("jvm") version Version.KOTLIN
     id("com.github.ben-manes.versions") version "0.20.0"
+    id("com.google.protobuf") version "0.8.7"
 }
 
 group = "com.github.jcornaz"
@@ -46,6 +49,16 @@ tasks {
             includeEngines("spek2")
         }
     }
+
+    clean {
+        delete("tmp")
+    }
+
+    protobuf {
+        protoc {
+            artifact = "com.google.protobuf:protoc:${Version.PROTOBUF}"
+        }
+    }
 }
 
 dependencies {
@@ -62,9 +75,14 @@ dependencies {
     testCompile("io.ktor:ktor-server-test-host:${Version.KTOR}")
     testCompile("io.ktor:ktor-client-mock-jvm:${Version.KTOR}")
 
-    compile("org.koin:koin-ktor:${Version.KOIN}")
-    compile("org.koin:koin-logger-slf4j:${Version.KOIN}")
-    testCompile("org.koin:koin-test:${Version.KOIN}")
+    compile("com.google.protobuf:protobuf-java:${Version.PROTOBUF}")
+
+    compile("org.neo4j.driver:neo4j-java-driver:${Version.NEO4J_DRIVER}")
+
+    testCompile("org.neo4j:neo4j:${Version.NEO4J}")
+    testCompile("org.neo4j:neo4j-kernel:${Version.NEO4J}:tests")
+    testCompile("org.neo4j:neo4j-io:${Version.NEO4J}:tests")
+    testCompile("org.neo4j.test:neo4j-harness:${Version.NEO4J}")
 
     compile("org.slf4j:slf4j-simple:${Version.SLF4J_SIMPLE}")
 

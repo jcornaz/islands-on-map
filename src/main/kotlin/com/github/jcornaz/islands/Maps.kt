@@ -2,12 +2,11 @@
 
 package com.github.jcornaz.islands
 
+import com.github.jcornaz.islands.domain.detectIslands
+import com.github.jcornaz.islands.persistence.IslandRepository
 import com.github.jcornaz.islands.persistence.TileMapRepository
 import io.ktor.application.Application
 import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.application.log
-import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
@@ -16,49 +15,54 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.util.*
 
-fun Application.maps(mapRepo: TileMapRepository) {
-
-    install(StatusPages) {
-        exception<IllegalArgumentException> {
-            log.error(it.message, it)
-            call.respond(HttpStatusCode.BadRequest)
-        }
-    }
-
+fun Application.maps(mapRepository: TileMapRepository, islandRepository: IslandRepository) {
     routing {
-        route("api/maps") {
+        route("/api/maps") {
             post {
-                val request = CreateTileMapRequest.parseFrom(call.receive<ByteArray>())
+                val request = call.receive<CreateTileMapRequest>()
+
+                require(request.tileCount > 0)
 
                 val map = TileMap.newBuilder()
-                    .setId(java.util.UUID.randomUUID().toString())
+                    .setId(UUID.randomUUID().toString())
                     .addAllTile(request.tileList)
                     .build()
 
-                mapRepo.create(map)
+                mapRepository.create(map)
 
-                call.respond(HttpStatusCode.Created, map.toByteArray())
+                coroutineScope {
+                    map.tileList.detectIslands().forEach { coordinates ->
+                        launch {
+                            islandRepository.create(
+                                Island.newBuilder()
+                                    .setId(UUID.randomUUID().toString())
+                                    .setMapId(map.id)
+                                    .addAllCoordinate(coordinates)
+                                    .build()
+                            )
+                        }
+                    }
+                }
+
+
+                call.respond(HttpStatusCode.Created, map)
             }
 
             get { _ ->
                 val builder = TileMapList.newBuilder()
 
-                mapRepo.findAll().consumeEach { builder.addTileMap(it) }
+                mapRepository.findAll().consumeEach { builder.addTileMap(it) }
 
-                call.respond(HttpStatusCode.OK, builder.build().toByteArray())
+                call.respond(HttpStatusCode.OK, builder.build())
             }
 
             get("{id}") {
-                log.info("fetch map id: \"${call.parameters["id"]}\"")
-                val map = mapRepo.findById(UUID.fromString(call.parameters["id"]))
-
-                if (map == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(HttpStatusCode.OK, map.toByteArray())
-                }
+                val map = mapRepository.findById(UUID.fromString(call.parameters["id"])) ?: throw ResourceNotFoundException()
+                call.respond(HttpStatusCode.OK, map)
             }
         }
     }

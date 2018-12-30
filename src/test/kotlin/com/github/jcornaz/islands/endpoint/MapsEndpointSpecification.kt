@@ -1,12 +1,11 @@
 package com.github.jcornaz.islands.endpoint
 
 import com.github.jcornaz.islands.*
-import com.github.jcornaz.islands.persistence.Neo4JTileMapRepository
 import com.github.jcornaz.islands.persistence.TestDatabase
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.TestApplicationCall
 import io.ktor.server.testing.setBody
-import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContainSame
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotBeNull
@@ -17,9 +16,8 @@ import java.util.*
 
 class MapsEndpointSpecification : Spek({
     val database by memoizedClosable(CachingMode.SCOPE) { TestDatabase() }
-    val application by memoizedClosable { TestApplication { maps(Neo4JTileMapRepository(database.driver)) } }
+    val application by memoizedClosable(CachingMode.GROUP) { TestApplication(database.driver) }
 
-    beforeEachTest { database += TestDataSet }
     afterEachTest { database.clear() }
 
     describe("post map") {
@@ -30,17 +28,13 @@ class MapsEndpointSpecification : Spek({
             .addTile(Tile.newBuilder().setCoordinate(Coordinate.newBuilder().setX(1).setY(1)).setType(TileType.LAND))
             .build()
 
-        val createCall by memoized {
-            application.handleRequest(HttpMethod.Post, "/api/maps") { setBody(inputMap.toByteArray()) }
+        lateinit var createCall: TestApplicationCall
+
+        beforeEachTest {
+            createCall = application.handleRequest(HttpMethod.Post, "/api/maps") { setBody(inputMap.toByteArray()) }
         }
 
-        it("should handle request") {
-            createCall.requestHandled.shouldBeTrue()
-        }
-
-        it("should return ${HttpStatusCode.Created}") {
-            createCall.response.status() shouldEqual HttpStatusCode.Created
-        }
+        itShouldHandleRequest(HttpStatusCode.Created) { createCall }
 
         describe("output map") {
             val outputMap by memoized { TileMap.parseFrom(createCall.response.byteContent) }
@@ -54,18 +48,9 @@ class MapsEndpointSpecification : Spek({
             }
 
             describe("fetch map list") {
-                val fetchAllCall by memoized {
-                    createCall.requestHandled.shouldBeTrue()
-                    application.handleRequest(HttpMethod.Get, "/api/maps")
-                }
+                val fetchAllCall by memoized { application.handleRequest(HttpMethod.Get, "/api/maps") }
 
-                it("should handle request") {
-                    fetchAllCall.requestHandled.shouldBeTrue()
-                }
-
-                it("should return ${HttpStatusCode.OK}") {
-                    fetchAllCall.response.status() shouldEqual HttpStatusCode.OK
-                }
+                itShouldHandleRequest { fetchAllCall }
 
                 it("should contain created map") {
                     val map = TileMapList.parseFrom(fetchAllCall.response.byteContent).tileMapList.first { it.id == outputMap.id }
@@ -74,16 +59,11 @@ class MapsEndpointSpecification : Spek({
             }
 
             describe("fetch created map") {
-                val fetchResult by memoized {
-                    createCall.requestHandled.shouldBeTrue()
-                    application.handleRequest(HttpMethod.Get, "/api/maps/${outputMap.id}")
-                }
+                val fetchByIdCall by memoized { application.handleRequest(HttpMethod.Get, "/api/maps/${outputMap.id}") }
 
-                val resultMap by memoized { TileMap.parseFrom(fetchResult.response.byteContent) }
+                val resultMap by memoized { TileMap.parseFrom(fetchByIdCall.response.byteContent) }
 
-                it("should return ${HttpStatusCode.OK}") {
-                    fetchResult.response.status() shouldEqual HttpStatusCode.OK
-                }
+                itShouldHandleRequest { fetchByIdCall }
 
                 it("should return the same map id") {
                     resultMap.id shouldEqual outputMap.id
@@ -96,29 +76,17 @@ class MapsEndpointSpecification : Spek({
         }
     }
 
-    describe("post empty map") {
-        val response by memoized {
-            application.handleRequest(HttpMethod.Post, "/api/maps") { setBody(CreateTileMapRequest.getDefaultInstance().toByteArray()) }
-        }
+    describe("fetch map list") {
+        val call by memoized { application.handleRequest(HttpMethod.Get, "/api/maps") }
 
-        it("should return bad ${HttpStatusCode.BadRequest}") {
-            response.response.status() shouldEqual HttpStatusCode.BadRequest
-        }
-    }
-
-    describe("get map list") {
-        val response by memoized { application.handleRequest(HttpMethod.Get, "/api/maps") }
-
-        it("should handle request") {
-            response.requestHandled.shouldBeTrue()
-        }
-
-        it("should return ${HttpStatusCode.OK}") {
-            response.response.status() shouldEqual HttpStatusCode.OK
-        }
+        itShouldHandleRequest { call }
 
         it("should return a valid array of TileMap") {
-            TileMapList.parseFrom(response.response.byteContent).shouldNotBeNull()
+            TileMapList.parseFrom(call.response.byteContent).shouldNotBeNull()
         }
     }
+
+    describeBadRequest("create with invalid body", HttpMethod.Post, "/api/maps", CreateTileMapRequest.getDefaultInstance()) { application }
+    describeBadRequest("fetch non-existing map", HttpMethod.Get, "/api/maps/${UUID(42L, 24L)}", expectedStatusCode = HttpStatusCode.NotFound) { application }
+    describeBadRequest("fetch map by id with invalid id", HttpMethod.Get, "/api/maps/abc") { application }
 })

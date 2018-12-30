@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.neo4j.driver.v1.AccessMode
 import org.neo4j.driver.v1.Driver
@@ -17,14 +16,6 @@ import kotlin.coroutines.CoroutineContext
 
 class Neo4JTileMapRepository(private val driver: Driver) : TileMapRepository, CoroutineScope {
     override val coroutineContext: CoroutineContext get() = Dispatchers.IO
-
-    init {
-        launch {
-            driver.session().use { session ->
-                session.run("CREATE INDEX ON :TileMap(id)")
-            }
-        }
-    }
 
     override suspend fun create(map: TileMap) {
         require(map.tileCount > 0)
@@ -35,7 +26,7 @@ class Neo4JTileMapRepository(private val driver: Driver) : TileMapRepository, Co
                     separator = ", ",
                     prefix = "CREATE (map:TileMap { id: \"${map.id}\" }), ",
                     transform = { tile -> "(map)-[:HAS_TILE]->(:Tile { coordinate: point({x: ${tile.coordinate.x}, y: ${tile.coordinate.y}}), type: ${tile.type.number}})" }
-                ))
+                )).consume()
             }
         }
     }
@@ -71,15 +62,15 @@ class Neo4JTileMapRepository(private val driver: Driver) : TileMapRepository, Co
             val result = session.run(
                 """
                 MATCH (map:TileMap)-[:HAS_TILE]->(tile:Tile)
-                RETURN map.id as mapid, tile.coordinate.x AS x, tile.coordinate.y AS y, tile.type AS type
-                ORDER BY mapid
+                RETURN map.id as mapId, tile.coordinate.x AS x, tile.coordinate.y AS y, tile.type AS type
+                ORDER BY mapId
                 """.trimIndent()
             )
 
             var currentBuilder: TileMap.Builder? = null
 
             result.forEach { record ->
-                val id = record["mapid"].asString()
+                val id = record["mapId"].asString()
 
                 if (id != currentBuilder?.id) {
                     currentBuilder?.let { send(it.build()) }

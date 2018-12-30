@@ -11,6 +11,10 @@ interface TileRepository {
 }
 
 interface IslandRepository {
+    suspend fun create(island: Island)
+
+    suspend fun findById(id: UUID): Island?
+
     fun findAll(): ReceiveChannel<Island>
 }
 

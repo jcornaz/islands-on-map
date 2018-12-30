@@ -7,5 +7,7 @@ option java_multiple_files = true;
 import "Resources.proto";
 
 message CreateTileMapRequest {
-    repeated Tile tile = 1;
+    reserved 1; // id
+
+    repeated Tile tile = 2;
 }

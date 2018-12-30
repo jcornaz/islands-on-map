@@ -9,6 +9,7 @@ import io.ktor.http.headersOf
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.io.ByteReadChannel
+import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContainSame
 import org.amshove.kluent.shouldEqualTo
 import org.spekframework.spek2.Spek
@@ -44,14 +45,13 @@ class RemoteTileRepositorySpecification : Spek({
         HttpStatusCode.allStatusCodes.asSequence()
             .filterNot { it.isSuccess() }
             .forEach { status ->
-                describe("remote returns $status") {
+                describe("remote returning $status") {
                     val engine by memoizedClosable { MockEngine { MockHttpResponse(call, status) } }
                     val repository by memoized { RemoteTileRepository(engine) }
+                    val result by memoizedBlocking { runCatching { repository.findAll().toList() } }
 
                     it("should fail") {
-                        assertFailsBlocking<Exception> {
-                            repository.findAll().toList()
-                        }
+                        result.isFailure.shouldBeTrue()
                     }
                 }
             }

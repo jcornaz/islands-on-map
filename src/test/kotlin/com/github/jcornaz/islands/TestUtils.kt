@@ -7,7 +7,7 @@ import org.spekframework.spek2.lifecycle.MemoizedValue
 import org.spekframework.spek2.style.specification.Suite
 import kotlin.test.assertFailsWith
 
-fun Suite.beforeEachTestBlocking(block: suspend () -> Unit) {
+fun Suite.beforeEachBlocking(block: suspend () -> Unit) {
     beforeEachTest { runBlocking { block() } }
 }
 

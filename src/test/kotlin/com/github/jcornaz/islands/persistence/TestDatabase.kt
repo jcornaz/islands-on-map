@@ -4,7 +4,6 @@ import com.github.jcornaz.islands.TestDataSet
 import org.neo4j.driver.v1.Driver
 import org.neo4j.driver.v1.GraphDatabase
 import org.neo4j.driver.v1.Record
-import org.neo4j.driver.v1.Session
 import org.neo4j.harness.TestServerBuilders
 import java.io.Closeable
 import java.io.File
@@ -14,9 +13,18 @@ class TestDatabase : Closeable {
 
     val driver: Driver = GraphDatabase.driver(service.boltURI())
 
-    private val session: Session = driver.session()
+    init {
+        try {
+            driver.createConstaints()
+        } catch (t: Throwable) {
+            close()
+            throw t
+        }
+    }
 
-    fun execute(statement: String): Sequence<Record> = session.run(statement).asSequence()
+    fun execute(statement: String): Sequence<Record> = driver.session().use { session ->
+        session.run(statement).list().asSequence()
+    }
 
     operator fun plusAssign(dataSet: TestDataSet) {
         dataSet.maps.forEach { map ->
@@ -33,7 +41,6 @@ class TestDatabase : Closeable {
     }
 
     override fun close() {
-        session.close()
         driver.close()
         runCatching { service.close() }
     }

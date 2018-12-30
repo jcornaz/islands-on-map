@@ -81,9 +81,9 @@ Here's a result example:
   * *For consistency, and testability I will also provide the following endpoints:*
     * [x] *`GET /api/maps` Should retrieve all created maps*
     * [x] *`GET /api/maps/:id` Should retrieve the map matching the given id.*
-* [ ] `GET /api/islands`
+* [x] `GET /api/islands`
   * Should retrieve all islands with the tiles that belong to them.
-* [ ] `GET /api/islands/:id`
+* [x] `GET /api/islands/:id`
   * Should retrieve just one island with the matching id. Also including related tiles.
 
 

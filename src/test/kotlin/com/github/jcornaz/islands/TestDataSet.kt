@@ -49,4 +49,42 @@ object TestDataSet {
         .build()
 
     val maps = listOf(providedMap, smallMap)
+
+    val islands: List<Island> = listOf(
+        Island.newBuilder()
+            .setId(UUID(0L, 3L).toString())
+            .setMapId(smallMap.id)
+            .addCoordinate(Coordinate(0, 0))
+            .build(),
+
+        Island.newBuilder()
+            .setId(UUID(0L, 4L).toString())
+            .setMapId(smallMap.id)
+            .addCoordinate(Coordinate(1, 1))
+            .build(),
+
+        Island.newBuilder()
+            .setId(UUID(0L, 5L).toString())
+            .setMapId(providedMap.id)
+            .addCoordinate(Coordinate(5, 1))
+            .build(),
+
+        Island.newBuilder()
+            .setId(UUID(0L, 6L).toString())
+            .setMapId(providedMap.id)
+            .addCoordinate(Coordinate(1, 1))
+            .addCoordinate(Coordinate(2, 1))
+            .addCoordinate(Coordinate(2, 2))
+            .build(),
+
+        Island.newBuilder()
+            .setId(UUID(0L, 7L).toString())
+            .setMapId(providedMap.id)
+            .addCoordinate(Coordinate(5, 3))
+            .addCoordinate(Coordinate(3, 4))
+            .addCoordinate(Coordinate(4, 4))
+            .addCoordinate(Coordinate(5, 4))
+            .addCoordinate(Coordinate(4, 5))
+            .build()
+    )
 }

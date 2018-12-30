@@ -13,7 +13,7 @@ import org.spekframework.spek2.style.specification.describe
 
 class DetectIslandsSpecification : Spek({
     describe("from provided map") {
-        val islands by memoized(CachingMode.SCOPE) { TestDataSet.providedMap.tileList.islands() }
+        val islands by memoized(CachingMode.SCOPE) { TestDataSet.providedMap.tileList.detectIslands() }
 
         it("should return 3 islands") {
             islands.size shouldEqual 3
@@ -50,7 +50,7 @@ class DetectIslandsSpecification : Spek({
             Tile(1, 1, TileType.WATER)
         )
 
-        val islands by memoized { tiles.islands() }
+        val islands by memoized { tiles.detectIslands() }
 
         it("should not return any island") {
             islands.shouldBeEmpty()
@@ -65,7 +65,7 @@ class DetectIslandsSpecification : Spek({
             Tile(1, 1, TileType.LAND)
         )
 
-        val islands by memoized { tiles.islands() }
+        val islands by memoized { tiles.detectIslands() }
 
         it("should return one island") {
             islands.size shouldEqual 1
@@ -77,7 +77,7 @@ class DetectIslandsSpecification : Spek({
     }
 
     describe("from empty tile-map") {
-        val islands by memoized { emptyList<Tile>().islands() }
+        val islands by memoized { emptyList<Tile>().detectIslands() }
 
         it("should not return any island") {
             islands.shouldBeEmpty()
@@ -92,7 +92,7 @@ class DetectIslandsSpecification : Spek({
             Tile(1, 1, TileType.LAND)
         )
 
-        val islands by memoized { map.islands() }
+        val islands by memoized { map.detectIslands() }
 
         it("should detect 2 islands") {
             islands.size shouldEqual 2

@@ -22,7 +22,7 @@ class Neo4JTileMapRepositorySpecification : Spek({
     val newId = UUID(42L, 24L).toString()
 
     describe("create map") {
-        beforeEachTestBlocking {
+        beforeEachBlocking {
             repository.create(
                 TileMap.newBuilder()
                     .setId(newId)

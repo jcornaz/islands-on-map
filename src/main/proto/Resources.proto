@@ -31,5 +31,9 @@ message TileMapList {
 message Island {
     string id = 2;
     string map_id = 1;
-    repeated TileMap tileMap = 3;
+    repeated Coordinate coordinate = 3;
+}
+
+message IslandList {
+    repeated Island island = 1;
 }

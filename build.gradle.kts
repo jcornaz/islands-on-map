@@ -76,6 +76,7 @@ dependencies {
     testCompile("io.ktor:ktor-client-mock-jvm:${Version.KTOR}")
 
     compile("com.google.protobuf:protobuf-java:${Version.PROTOBUF}")
+    compile("com.google.protobuf:protobuf-java-util:${Version.PROTOBUF}")
 
     compile("org.neo4j.driver:neo4j-java-driver:${Version.NEO4J_DRIVER}")
 

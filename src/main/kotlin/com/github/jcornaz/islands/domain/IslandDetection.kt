@@ -4,7 +4,7 @@ import com.github.jcornaz.islands.Coordinate
 import com.github.jcornaz.islands.Tile
 import com.github.jcornaz.islands.TileType
 
-fun Iterable<Tile>.islands(): Collection<Set<Coordinate>> {
+fun Iterable<Tile>.detectIslands(): Collection<Set<Coordinate>> {
     val result = ArrayList<Set<Coordinate>>()
     val unseenCoordinates = HashSet<Coordinate>()
     val map = HashMap<Coordinate, TileType>()

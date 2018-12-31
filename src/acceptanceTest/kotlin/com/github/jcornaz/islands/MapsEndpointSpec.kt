@@ -1,7 +1,7 @@
-package com.github.jcornaz.islands.endpoint
+package com.github.jcornaz.islands
 
-import com.github.jcornaz.islands.*
-import com.github.jcornaz.islands.persistence.TestDatabase
+import com.github.jcornaz.islands.persistence.test.TestDatabase
+import com.github.jcornaz.islands.test.memoizedClosable
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationCall
@@ -9,18 +9,19 @@ import io.ktor.server.testing.setBody
 import org.amshove.kluent.shouldContainSame
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotBeNull
+import org.amshove.kluent.shouldNotBeNullOrBlank
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.style.specification.describe
 import java.util.*
 
-class MapsEndpointSpecification : Spek({
+class MapsEndpointSpec : Spek({
     val database by memoizedClosable(CachingMode.SCOPE) { TestDatabase() }
     val application by memoizedClosable(CachingMode.GROUP) { TestApplication(database.driver) }
 
     afterEachTest { database.clear() }
 
-    describe("post map") {
+    describe("create map") {
         val inputMap = CreateTileMapRequest.newBuilder()
             .addTile(Tile.newBuilder().setCoordinate(Coordinate.newBuilder().setX(0).setY(0)).setType(TileType.LAND))
             .addTile(Tile.newBuilder().setCoordinate(Coordinate.newBuilder().setX(0).setY(1)).setType(TileType.WATER))
@@ -36,15 +37,15 @@ class MapsEndpointSpecification : Spek({
 
         itShouldHandleRequest(HttpStatusCode.Created) { createCall }
 
-        describe("output map") {
+        describe("given the created map") {
             val outputMap by memoized { TileMap.parseFrom(createCall.response.byteContent) }
 
-            it("should return a valid tile map") {
+            it("should contains a valid tile set") {
                 outputMap.tileList shouldContainSame inputMap.tileList
             }
 
-            it("should return a map with an id") {
-                UUID.fromString(outputMap.id)
+            it("should contains a valid id") {
+                outputMap.id.shouldNotBeNullOrBlank()
             }
 
             describe("fetch map list") {
@@ -52,7 +53,7 @@ class MapsEndpointSpecification : Spek({
 
                 itShouldHandleRequest { fetchAllCall }
 
-                it("should contain created map") {
+                it("should return created map") {
                     val map = TileMapList.parseFrom(fetchAllCall.response.byteContent).tileMapList.first { it.id == outputMap.id }
                     map.tileList shouldContainSame outputMap.tileList
                 }

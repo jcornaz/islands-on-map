@@ -1,18 +1,13 @@
-package com.github.jcornaz.islands
+package com.github.jcornaz.islands.test
 
 import kotlinx.coroutines.runBlocking
 import org.spekframework.spek2.dsl.LifecycleAware
 import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.lifecycle.MemoizedValue
 import org.spekframework.spek2.style.specification.Suite
-import kotlin.test.assertFailsWith
 
 fun Suite.beforeEachBlocking(block: suspend () -> Unit) {
     beforeEachTest { runBlocking { block() } }
-}
-
-inline fun <reified T : Throwable> assertFailsBlocking(crossinline block: suspend () -> Unit) {
-    assertFailsWith<T> { runBlocking { block() } }
 }
 
 fun <T> LifecycleAware.memoizedBlocking(mode: CachingMode = defaultCachingMode, destructor: (T) -> Unit = {}, factory: suspend () -> T): MemoizedValue<T> =

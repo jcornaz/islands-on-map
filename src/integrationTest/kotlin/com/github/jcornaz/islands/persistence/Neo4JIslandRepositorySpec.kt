@@ -1,6 +1,11 @@
 package com.github.jcornaz.islands.persistence
 
-import com.github.jcornaz.islands.*
+import com.github.jcornaz.islands.Island
+import com.github.jcornaz.islands.persistence.test.TestDatabase
+import com.github.jcornaz.islands.test.coordinate
+import com.github.jcornaz.islands.test.beforeEachBlocking
+import com.github.jcornaz.islands.test.memoizedBlocking
+import com.github.jcornaz.islands.test.memoizedClosable
 import kotlinx.coroutines.channels.toList
 import org.amshove.kluent.shouldBeNull
 import org.amshove.kluent.shouldContainSame
@@ -12,11 +17,11 @@ import org.spekframework.spek2.style.specification.Suite
 import org.spekframework.spek2.style.specification.describe
 import java.util.*
 
-class Neo4JIslandRepositorySpecification : Spek({
+class Neo4JIslandRepositorySpec : Spek({
     val database by memoizedClosable(CachingMode.SCOPE) { TestDatabase() }
     val repository: IslandRepository by memoized { Neo4JIslandRepository(database.driver) }
 
-    val ids = generateSequence(0) { it + 1 }.map { UUID(0L, it.toLong()) }.iterator()
+    val idSequence = generateSequence(0) { it + 1 }.map { UUID(0L, it.toLong()) }.iterator()
 
     afterEachTest { database.clear() }
 
@@ -40,15 +45,15 @@ class Neo4JIslandRepositorySpecification : Spek({
     describe("create island for a non-existing map") {
         itShouldFailToCreateInvalidIsland(
             Island.newBuilder()
-                .setId(ids.next().toString())
-                .setMapId(ids.next().toString())
-                .addCoordinate(Coordinate(0, 0))
+                .setId(idSequence.next().toString())
+                .setMapId(idSequence.next().toString())
+                .addCoordinate(coordinate(0, 0))
                 .build()
         )
     }
 
     describe("given an existing map") {
-        val mapId = ids.next()
+        val mapId = idSequence.next()
 
         beforeEach {
             database.execute(
@@ -70,23 +75,23 @@ class Neo4JIslandRepositorySpecification : Spek({
         describe("create island with non-existing coordinate") {
             itShouldFailToCreateInvalidIsland(
                 Island.newBuilder()
-                    .setId(ids.next().toString())
+                    .setId(idSequence.next().toString())
                     .setMapId(mapId.toString())
-                    .addCoordinate(Coordinate(2, 2))
+                    .addCoordinate(coordinate(2, 2))
                     .build()
             )
         }
 
         describe("create new island") {
-            val islandId = ids.next()
+            val islandId = idSequence.next()
 
             beforeEachBlocking {
                 repository.create(
                     Island.newBuilder()
                         .setId(islandId.toString())
                         .setMapId(mapId.toString())
-                        .addCoordinate(Coordinate(0, 0))
-                        .addCoordinate(Coordinate(0, 1))
+                        .addCoordinate(coordinate(0, 0))
+                        .addCoordinate(coordinate(0, 1))
                         .build()
                 )
             }
@@ -98,8 +103,8 @@ class Neo4JIslandRepositorySpecification : Spek({
 
             it("should attach tiles to created island") {
                 database.execute("MATCH (:Island { id: \"$islandId\" })-[:HAS_TILE]->(tile:Tile) RETURN tile.coordinate.x, tile.coordinate.y")
-                    .map { Coordinate(it[0].asInt(), it[1].asInt()) }
-                    .toList() shouldContainSame listOf(Coordinate(0, 0), Coordinate(0, 1))
+                    .map { coordinate(it[0].asInt(), it[1].asInt()) }
+                    .toList() shouldContainSame listOf(coordinate(0, 0), coordinate(0, 1))
             }
 
             it("should attach created island to the map") {
@@ -109,7 +114,7 @@ class Neo4JIslandRepositorySpecification : Spek({
         }
 
         describe("given an existing island") {
-            val islandId = ids.next()
+            val islandId = idSequence.next()
 
             beforeEach {
                 database.execute(
@@ -130,9 +135,9 @@ class Neo4JIslandRepositorySpecification : Spek({
             describe("create existing island") {
                 itShouldFailToCreateInvalidIsland(
                     Island.newBuilder()
-                        .setId(ids.next().toString())
+                        .setId(idSequence.next().toString())
                         .setMapId(mapId.toString())
-                        .addCoordinate(Coordinate(2, 2))
+                        .addCoordinate(coordinate(2, 2))
                         .build()
                 )
             }
@@ -153,12 +158,12 @@ class Neo4JIslandRepositorySpecification : Spek({
                 }
 
                 it("should return island with expected coordinates") {
-                    result?.coordinateList.orEmpty() shouldContainSame listOf(Coordinate(0, 0), Coordinate(0, 1))
+                    result?.coordinateList.orEmpty() shouldContainSame listOf(coordinate(0, 0), coordinate(0, 1))
                 }
             }
 
             describe("find by id a non-existing island") {
-                val id = ids.next()
+                val id = idSequence.next()
                 val result by memoizedBlocking { repository.findById(id) }
 
                 it("should return null") {
@@ -167,7 +172,7 @@ class Neo4JIslandRepositorySpecification : Spek({
             }
 
             describe("given another existing map") {
-                val otherMapId = ids.next()
+                val otherMapId = idSequence.next()
 
                 beforeEach {
                     database.execute(
@@ -183,16 +188,16 @@ class Neo4JIslandRepositorySpecification : Spek({
                 }
 
                 describe("create new island") {
-                    val newIslandId = ids.next()
+                    val newIslandId = idSequence.next()
 
                     beforeEachBlocking {
                         repository.create(
                             Island.newBuilder()
                                 .setId(newIslandId.toString())
                                 .setMapId(otherMapId.toString())
-                                .addCoordinate(Coordinate(0, 1))
-                                .addCoordinate(Coordinate(1, 0))
-                                .addCoordinate(Coordinate(1, 1))
+                                .addCoordinate(coordinate(0, 1))
+                                .addCoordinate(coordinate(1, 0))
+                                .addCoordinate(coordinate(1, 1))
                                 .build()
                         )
                     }
@@ -204,8 +209,8 @@ class Neo4JIslandRepositorySpecification : Spek({
 
                     it("should attach tiles to created island") {
                         database.execute("MATCH (:Island { id: \"$newIslandId\" })-[:HAS_TILE]->(tile:Tile) RETURN tile.coordinate.x, tile.coordinate.y")
-                            .map { Coordinate(it[0].asInt(), it[1].asInt()) }
-                            .toList() shouldContainSame listOf(Coordinate(0, 1), Coordinate(1, 0), Coordinate(1, 1))
+                            .map { coordinate(it[0].asInt(), it[1].asInt()) }
+                            .toList() shouldContainSame listOf(coordinate(0, 1), coordinate(1, 0), coordinate(1, 1))
                     }
 
                     it("should attach created island to the map") {
@@ -215,7 +220,7 @@ class Neo4JIslandRepositorySpecification : Spek({
                 }
 
                 describe("given another island") {
-                    val otherIslandId = ids.next()
+                    val otherIslandId = idSequence.next()
 
                     beforeEach {
                         database.execute(
@@ -256,7 +261,7 @@ class Neo4JIslandRepositorySpecification : Spek({
                             }
 
                             it("should contains expected coordinates") {
-                                island.coordinateList shouldContainSame listOf(Coordinate(0, 0), Coordinate(0, 1))
+                                island.coordinateList shouldContainSame listOf(coordinate(0, 0), coordinate(0, 1))
                             }
                         }
 
@@ -272,7 +277,7 @@ class Neo4JIslandRepositorySpecification : Spek({
                             }
 
                             it("should contains expected coordinates") {
-                                island.coordinateList shouldContainSame listOf(Coordinate(0, 1), Coordinate(1, 0), Coordinate(1, 1))
+                                island.coordinateList shouldContainSame listOf(coordinate(0, 1), coordinate(1, 0), coordinate(1, 1))
                             }
                         }
                     }

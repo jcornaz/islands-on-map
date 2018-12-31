@@ -1,6 +1,6 @@
-package com.github.jcornaz.islands.persistence
+package com.github.jcornaz.islands.persistence.test
 
-import com.github.jcornaz.islands.TestDataSet
+import com.github.jcornaz.islands.persistence.createConstaints
 import org.neo4j.driver.v1.Driver
 import org.neo4j.driver.v1.GraphDatabase
 import org.neo4j.driver.v1.Record
@@ -22,18 +22,8 @@ class TestDatabase : Closeable {
         }
     }
 
-    fun execute(statement: String): Sequence<Record> = driver.session().use { session ->
-        session.run(statement).list().asSequence()
-    }
-
-    operator fun plusAssign(dataSet: TestDataSet) {
-        dataSet.maps.forEach { map ->
-            execute(map.tileList.joinToString(
-                separator = ", ",
-                prefix = "CREATE (map:TileMap { id: \"${map.id}\" }), ",
-                transform = { tile -> "(map)-[:HAS_TILE]->(:Tile { coordinate: point({x: ${tile.coordinate.x}, y: ${tile.coordinate.y}}), type: ${tile.type.number} })" }
-            ))
-        }
+    fun execute(statement: String): List<Record> = driver.session().use { session ->
+        session.run(statement).list()
     }
 
     fun clear() {

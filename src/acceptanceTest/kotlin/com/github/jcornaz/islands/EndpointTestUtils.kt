@@ -1,4 +1,4 @@
-package com.github.jcornaz.islands.endpoint
+package com.github.jcornaz.islands
 
 import com.google.protobuf.Message
 import io.ktor.http.HttpMethod

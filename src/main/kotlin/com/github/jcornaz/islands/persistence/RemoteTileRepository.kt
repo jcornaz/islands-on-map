@@ -5,6 +5,7 @@ import com.github.jcornaz.islands.Tile
 import com.github.jcornaz.islands.TileType
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.features.json.GsonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.get
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +21,9 @@ class RemoteTileRepository(engine: HttpClientEngine) : TileRepository, Coroutine
     override val coroutineContext: CoroutineContext get() = Dispatchers.Default
 
     private val client = HttpClient(engine) {
-        install(JsonFeature)
+        install(JsonFeature) {
+            serializer = GsonSerializer()
+        }
     }
 
     override fun findAll(): ReceiveChannel<Tile> = produce(capacity = Channel.UNLIMITED) {

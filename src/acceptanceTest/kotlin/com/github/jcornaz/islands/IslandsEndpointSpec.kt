@@ -3,7 +3,6 @@ package com.github.jcornaz.islands
 import com.github.jcornaz.islands.test.*
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.setBody
 import org.amshove.kluent.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.lifecycle.CachingMode
@@ -34,7 +33,7 @@ class IslandsEndpointSpec : Spek({
                     .addTile(tile(1, 1, TileType.LAND))
                     .build()
             ).map { request ->
-                application.handleRequest(HttpMethod.Post, "/api/maps") { setBody(request.toByteArray()) }
+                application.handleRequest(HttpMethod.Post, "/api/maps") { setBody(request) }
                     .response.byteContent.let(TileMap::parseFrom)
             }
         }

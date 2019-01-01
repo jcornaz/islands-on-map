@@ -4,7 +4,6 @@ import com.github.jcornaz.islands.test.*
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationCall
-import io.ktor.server.testing.setBody
 import org.amshove.kluent.shouldContainSame
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotBeNull
@@ -31,7 +30,7 @@ class MapsEndpointSpec : Spek({
         lateinit var createCall: TestApplicationCall
 
         beforeEachTest {
-            createCall = application.handleRequest(HttpMethod.Post, "/api/maps") { setBody(inputMap.toByteArray()) }
+            createCall = application.handleRequest(HttpMethod.Post, "/api/maps") { setBody(inputMap) }
         }
 
         itShouldHandleRequest(HttpStatusCode.Created) { createCall }

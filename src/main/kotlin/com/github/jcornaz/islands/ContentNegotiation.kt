@@ -16,7 +16,7 @@ import kotlin.reflect.full.staticFunctions
 
 fun Application.installContentNegotiation() {
     install(ContentNegotiation) {
-        register(ContentType.Any, ProtobufConverter)
+        register(ContentType.Application.OctetStream, ProtobufConverter)
     }
 }
 

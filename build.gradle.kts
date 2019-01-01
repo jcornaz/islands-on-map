@@ -25,7 +25,7 @@ repositories {
 
 testSets {
     val integration = create("integrationTest")
-    create("acceptanceTest") { extendsFrom(integration)}
+    create("acceptanceTest") { extendsFrom(integration) }
 }
 
 dependencies {
@@ -35,29 +35,28 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Version.COROUTINES}")
 
     implementation("io.ktor:ktor-server-netty:${Version.KTOR}")
-    implementation("io.ktor:ktor-gson:${Version.KTOR}")
     implementation("io.ktor:ktor-client-core:${Version.KTOR}")
     implementation("io.ktor:ktor-client-gson:${Version.KTOR}")
     implementation("io.ktor:ktor-client-apache:${Version.KTOR}")
 
     implementation("com.google.protobuf:protobuf-java:${Version.PROTOBUF}")
-    implementation("com.google.protobuf:protobuf-java-util:${Version.PROTOBUF}")
 
     implementation("org.neo4j.driver:neo4j-java-driver:${Version.NEO4J_DRIVER}")
 
     implementation("org.slf4j:slf4j-simple:${Version.SLF4J_SIMPLE}")
 
+    testApi("org.jetbrains.kotlin:kotlin-test:${Version.KOTLIN}")
     testApi("org.spekframework.spek2:spek-dsl-jvm:${Version.SPEK}")
     testApi("org.amshove.kluent:kluent:${Version.KLUENT}")
+    testApi("io.mockk:mockk:${Version.MOCKK}")
+    testApi("com.github.jcornaz.miop:miop-jvm:${Version.MIOP}")
+    testApi("io.ktor:ktor-client-mock-jvm:${Version.KTOR}")
 
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:${Version.SPEK}")
 
     add("integrationTestImplementation", sourceSets["test"].output)
-    add("integrationTestImplementation", "org.neo4j.test:neo4j-harness:${Version.NEO4J}")
     add("integrationTestImplementation", "org.neo4j:neo4j:${Version.NEO4J}")
-    add("integrationTestImplementation", "org.neo4j:neo4j-kernel:${Version.NEO4J}:tests")
-    add("integrationTestImplementation", "org.neo4j:neo4j-io:${Version.NEO4J}:tests")
-    add("integrationTestImplementation", "io.ktor:ktor-client-mock-jvm:${Version.KTOR}")
+    add("integrationTestImplementation", "org.neo4j.test:neo4j-harness:${Version.NEO4J}")
 
     add("acceptanceTestImplementation", sourceSets["test"].output)
     add("acceptanceTestImplementation", sourceSets["integrationTest"].output)

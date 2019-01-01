@@ -12,4 +12,6 @@ object Version {
 
     const val KLUENT = "1.44"
     const val SPEK = "2.0.0-rc.1"
+    const val MOCKK = "1.8.13.kotlin13"
+    const val MIOP = "0.3.0"
 }

@@ -1,4 +1,4 @@
-package com.github.jcornaz.islands.persistence.test
+package com.github.jcornaz.islands.test
 
 import com.github.jcornaz.islands.persistence.createConstaints
 import org.neo4j.driver.v1.Driver
@@ -9,7 +9,7 @@ import java.io.Closeable
 import java.io.File
 
 class TestDatabase : Closeable {
-    private val service = TestServerBuilders.newInProcessBuilder(File("tmp")).newServer()
+    private val service = TestServerBuilders.newInProcessBuilder(File("build/tmp/db")).newServer()
 
     val driver: Driver = GraphDatabase.driver(service.boltURI())
 

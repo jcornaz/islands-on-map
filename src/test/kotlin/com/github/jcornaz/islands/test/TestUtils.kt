@@ -1,5 +1,6 @@
 package com.github.jcornaz.islands.test
 
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.spekframework.spek2.dsl.LifecycleAware
 import org.spekframework.spek2.lifecycle.CachingMode
@@ -15,3 +16,10 @@ fun <T> LifecycleAware.memoizedBlocking(mode: CachingMode = defaultCachingMode, 
 
 fun <T : AutoCloseable> LifecycleAware.memoizedClosable(mode: CachingMode = defaultCachingMode, factory: () -> T): MemoizedValue<T> =
     memoized(mode = mode, factory = factory, destructor = { runCatching { it.close() } })
+
+inline fun <reified T : Any> LifecycleAware.memoizedMock(
+    relaxed: Boolean = false,
+    relaxUnitFun: Boolean = false,
+    crossinline setup: T.() -> Unit = {}
+): MemoizedValue<T> =
+    memoized { mockk(relaxed = relaxed, relaxUnitFun = relaxUnitFun, block = setup) }

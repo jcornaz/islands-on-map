@@ -15,34 +15,38 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlin.coroutines.CoroutineContext
 
-private const val URL = "https://private-2e8649-advapi.apiary-mock.com/map"
-
-class RemoteTileRepository(engine: HttpClientEngine) : TileRepository, CoroutineScope {
+class RemoteTileRepository(private val engine: HttpClientEngine, private val url: String) : TileRepository, CoroutineScope {
     override val coroutineContext: CoroutineContext get() = Dispatchers.Default
 
-    private val client = HttpClient(engine) {
-        install(JsonFeature) {
-            serializer = GsonSerializer()
+    override fun findAll(): ReceiveChannel<Tile> = produce(capacity = Channel.UNLIMITED) {
+        withClient {
+            val answer = get<RemoteAnswer>(url)
+
+            answer.attributes.tiles.forEach { (x, y, type) ->
+                send(
+                    Tile.newBuilder()
+                        .setCoordinate(Coordinate.newBuilder().setX(x).setY(y))
+                        .setType(tileTypeOf(type))
+                        .build()
+                )
+            }
         }
     }
 
-    override fun findAll(): ReceiveChannel<Tile> = produce(capacity = Channel.UNLIMITED) {
-        val answer = client.get<RemoteAnswer>(URL)
+    private fun tileTypeOf(value: String): TileType = when (value) {
+        "land" -> TileType.LAND
+        "water" -> TileType.WATER
+        else -> TileType.UNRECOGNIZED
+    }
 
-        answer.attributes.tiles.forEach { (x, y, type) ->
-            send(
-                Tile.newBuilder()
-                    .setCoordinate(Coordinate.newBuilder().setX(x).setY(y))
-                    .setType(
-                        when (type) {
-                            "land" -> TileType.LAND
-                            "water" -> TileType.WATER
-                            else -> TileType.UNRECOGNIZED
-                        }
-                    )
-                    .build()
-            )
+    private inline fun <R> withClient(block: HttpClient.() -> R): R {
+        val client = HttpClient(engine) {
+            install(JsonFeature) {
+                serializer = GsonSerializer()
+            }
         }
+
+        return client.use(block)
     }
 
     private data class RemoteAnswer(val attributes: RemoteAttributes)

@@ -19,11 +19,11 @@ import java.util.*
 
 class DefaultMapServiceSpec : Spek({
 
-    val mapRepository by memoizedMock<TileMapRepository>(relaxed = true)
-    val islandRepository by memoizedMock<IslandRepository>(relaxed = true)
-    val islandDetection by memoizedMock<(Iterable<Tile>) -> Collection<Set<Coordinate>>>()
+    val mapRepository: TileMapRepository by memoizedMock(relaxed = true)
+    val islandRepository: IslandRepository by memoizedMock(relaxed = true)
+    val islandDetection: (Iterable<Tile>) -> Collection<Set<Coordinate>> by memoizedMock()
 
-    val service by memoized { DefaultMapService(mapRepository, islandRepository, islandDetection) }
+    val service: MapService by memoized { DefaultMapService(mapRepository, islandRepository, islandDetection) }
 
     describe("given mapRepository.findById(UUID) returns a map") {
         val id = UUID(0L, 1L)

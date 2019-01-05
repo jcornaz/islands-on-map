@@ -49,9 +49,10 @@ class Neo4JIslandRepository(private val driver: Driver) : IslandRepository, Coro
         driver.session(AccessMode.READ).use { session ->
             val result = session.run(
                 """
-                    MATCH (map:TileMap)-[:HAS_ISLAND]->(island:Island { id: "$id" })-[:HAS_TILE]->(tile:Tile)
+                    MATCH (map:TileMap)-[:HAS_ISLAND]->(island:Island { id: ${'$'}id })-[:HAS_TILE]->(tile:Tile)
                     RETURN map.id AS mapId, tile.coordinate.x AS x, tile.coordinate.y AS y
-                """.trimIndent()
+                """.trimIndent(),
+                mapOf("id" to id.toString())
             )
 
             if (!result.hasNext()) return@use null

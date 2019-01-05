@@ -14,7 +14,7 @@ import org.spekframework.spek2.style.specification.describe
 
 class RemoteTileRepositoryIntegrationSpec : Spek({
     val engine by memoizedClosable { Apache.create() }
-    val repository by memoized { RemoteTileRepository(engine) }
+    val repository by memoized { RemoteTileRepository(engine, "https://private-2e8649-advapi.apiary-mock.com/map") }
 
     describe("find all") {
         val result by memoizedBlocking(CachingMode.SCOPE) { repository.findAll().toList() }

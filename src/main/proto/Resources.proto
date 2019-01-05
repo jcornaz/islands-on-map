@@ -37,3 +37,20 @@ message Island {
 message IslandList {
     repeated Island island = 1;
 }
+
+message FetchRequest {
+    string id = 1;
+    string url = 2;
+    Status status = 3;
+
+    oneof result {
+        string map_id = 4;
+        string error = 5;
+    }
+
+    enum Status {
+        PENDING = 0;
+        IN_PROGRESS = 1;
+        DONE = 2;
+    }
+}

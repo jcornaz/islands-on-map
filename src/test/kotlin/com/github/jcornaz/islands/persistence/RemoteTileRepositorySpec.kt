@@ -1,29 +1,27 @@
 package com.github.jcornaz.islands.persistence
 
 import com.github.jcornaz.islands.TileType
-import com.github.jcornaz.islands.test.tile
 import com.github.jcornaz.islands.test.memoizedBlocking
 import com.github.jcornaz.islands.test.memoizedClosable
+import com.github.jcornaz.islands.test.tile
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockHttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.headersOf
-import io.ktor.http.isSuccess
+import io.ktor.http.*
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.io.ByteReadChannel
 import org.amshove.kluent.shouldContainSame
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotBeNull
 import org.spekframework.spek2.Spek
-import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.style.specification.describe
 
 class RemoteTileRepositorySpec : Spek({
 
     describe("expected data") {
-        val engine by memoizedClosable(CachingMode.SCOPE) {
+        val engine by memoizedClosable {
             MockEngine {
+                url shouldEqual Url("http://my-url.net/")
+
                 MockHttpResponse(
                     call,
                     HttpStatusCode.OK,
@@ -46,14 +44,14 @@ class RemoteTileRepositorySpec : Spek({
                                     ]
                                 }
                             }
-                        """.toByteArray()
+                        """
                     ),
                     headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
                 )
             }
         }
 
-        val result by memoizedBlocking(CachingMode.SCOPE) { RemoteTileRepository(engine).findAll().toList() }
+        val result by memoizedBlocking { RemoteTileRepository(engine, "http://my-url.net/").findAll().toList() }
 
         it("should return 4 tiles") {
             result.size shouldEqual 4
@@ -74,8 +72,13 @@ class RemoteTileRepositorySpec : Spek({
             .filterNot { it.isSuccess() }
             .forEach { status ->
                 describe("remote returning $status") {
-                    val engine by memoizedClosable { MockEngine { MockHttpResponse(call, status) } }
-                    val repository by memoized { RemoteTileRepository(engine) }
+                    val engine by memoizedClosable {
+                        MockEngine {
+                            url shouldEqual Url("http://failing-url.net/")
+                            MockHttpResponse(call, status)
+                        }
+                    }
+                    val repository by memoized { RemoteTileRepository(engine, "http://failing-url.net/") }
                     val exception by memoizedBlocking { runCatching { repository.findAll().toList() }.exceptionOrNull() }
 
                     it("should fail") {

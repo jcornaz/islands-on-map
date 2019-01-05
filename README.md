@@ -88,10 +88,10 @@ Here's a result example:
 
 
 *Since I changed the specification of `POST /api/maps`, I'll also provide the following endpoints to make it simpler to fill the database*
-  * [ ] `POST /api/maps/fetch-requests`
+  * [x] `POST /api/maps/fetch-requests`
     * Create a request for the server to fetch an URL and create map returned by the URL.
     * Returns the request ID
-  * [ ] `GEt /api/maps/fetch-requests/:id`
+  * [x] `GET /api/maps/fetch-requests/:id`
     * Returns the state of the given request (pending, success or failed)
   
 ##### Bonus tasks

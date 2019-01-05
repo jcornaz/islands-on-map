@@ -85,7 +85,23 @@ class MapsEndpointSpec : Spek({
         }
     }
 
-    describeBadRequest("create with invalid body", HttpMethod.Post, "/api/maps", CreateTileMapRequest.getDefaultInstance()) { application }
-    describeBadRequest("fetch non-existing map", HttpMethod.Get, "/api/maps/${UUID(42L, 24L)}", expectedStatusCode = HttpStatusCode.NotFound) { application }
-    describeBadRequest("fetch map by id with invalid id", HttpMethod.Get, "/api/maps/abc") { application }
+    describe("create with invalid body") {
+        itShouldHandleRequest(HttpStatusCode.BadRequest) {
+            application.handleRequest(HttpMethod.Post, "/api/maps") {
+                setBody(CreateTileMapRequest.getDefaultInstance())
+            }
+        }
+    }
+
+    describe("fetch non-existing map") {
+        itShouldHandleRequest(HttpStatusCode.NotFound) {
+            application.handleRequest(HttpMethod.Get, "/api/maps/${UUID(42L, 24L)}")
+        }
+    }
+
+    describe("fetch map by id with invalid id") {
+        itShouldHandleRequest(HttpStatusCode.BadRequest) {
+            application.handleRequest(HttpMethod.Get, "/api/maps/abc")
+        }
+    }
 })

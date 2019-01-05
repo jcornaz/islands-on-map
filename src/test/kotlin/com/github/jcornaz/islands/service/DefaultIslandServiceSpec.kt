@@ -1,6 +1,7 @@
 package com.github.jcornaz.islands.service
 
 import com.github.jcornaz.islands.Coordinate
+import com.github.jcornaz.islands.FetchRequest
 import com.github.jcornaz.islands.Island
 import com.github.jcornaz.islands.ResourceNotFoundException
 import com.github.jcornaz.islands.persistence.IslandRepository

@@ -8,7 +8,7 @@ import org.spekframework.spek2.lifecycle.MemoizedValue
 import org.spekframework.spek2.style.specification.Suite
 
 fun Suite.beforeEachBlocking(block: suspend () -> Unit) {
-    beforeEachTest { runBlocking { block() } }
+    beforeEach { runBlocking { block() } }
 }
 
 fun <T> LifecycleAware.memoizedBlocking(mode: CachingMode = defaultCachingMode, destructor: (T) -> Unit = {}, factory: suspend () -> T): MemoizedValue<T> =

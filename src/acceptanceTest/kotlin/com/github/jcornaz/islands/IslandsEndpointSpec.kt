@@ -106,6 +106,15 @@ class IslandsEndpointSpec : Spek({
         }
     }
 
-    describeBadRequest("fetch non-existing island", HttpMethod.Get, "/api/islands/${UUID(42L, 24L)}", expectedStatusCode = HttpStatusCode.NotFound) { application }
-    describeBadRequest("fetch island by id with invalid id", HttpMethod.Get, "/api/islands/abc") { application }
+    describe("fetch non-existing island") {
+        itShouldHandleRequest(HttpStatusCode.NotFound) {
+            application.handleRequest(HttpMethod.Get, "/api/islands/${UUID(42L, 24L)}")
+        }
+    }
+
+    describe("fetch island by id with invalid id") {
+        itShouldHandleRequest(HttpStatusCode.BadRequest) {
+            application.handleRequest(HttpMethod.Get, "/api/islands/abc")
+        }
+    }
 })

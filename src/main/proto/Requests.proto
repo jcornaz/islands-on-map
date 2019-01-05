@@ -11,3 +11,11 @@ message CreateTileMapRequest {
 
     repeated Tile tile = 2;
 }
+
+message CreateFetchRequest {
+    reserved 1; // id
+    reserved 3; // status
+    reserved 4; // status
+
+    string url = 2;
+}

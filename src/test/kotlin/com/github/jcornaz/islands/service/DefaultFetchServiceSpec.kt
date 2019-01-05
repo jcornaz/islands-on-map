@@ -61,11 +61,11 @@ class DefaultFetchServiceSpec : Spek({
                 }
 
                 it("should set the request status to in progress") {
-                    coVerify(exactly = 1) { fetchRequestRepository.setInProgress(assert { it == id }) }
+                    coVerify(exactly = 1) { fetchRequestRepository.setInProgress(match { it == id }) }
                 }
 
                 it("should set the request status to successful") {
-                    coVerify(exactly = 1) { fetchRequestRepository.setSuccess(assert { it == id }, assert { it == mapId }) }
+                    coVerify(exactly = 1) { fetchRequestRepository.setSuccess(match { it == id }, match { it == mapId }) }
                 }
 
                 it("should not call setError") {
@@ -80,7 +80,7 @@ class DefaultFetchServiceSpec : Spek({
                 }
 
                 it("should create the map") {
-                    coVerify(exactly = 1) { mapService.create(assert { it.tileList.toSet() == tiles }) }
+                    coVerify(exactly = 1) { mapService.create(match { it.tileList.toSet() == tiles }) }
                 }
             }
         }
@@ -98,11 +98,11 @@ class DefaultFetchServiceSpec : Spek({
                 }
 
                 it("should set the request status to in progress") {
-                    coVerify(exactly = 1) { fetchRequestRepository.setInProgress(assert { it == id }) }
+                    coVerify(exactly = 1) { fetchRequestRepository.setInProgress(match { it == id }) }
                 }
 
                 it("should set the request status to error") {
-                    coVerify(exactly = 1) { fetchRequestRepository.setError(assert { it == id }, any()) }
+                    coVerify(exactly = 1) { fetchRequestRepository.setError(match { it == id }, any()) }
                 }
 
                 it("should not call setSuccess") {
@@ -110,11 +110,11 @@ class DefaultFetchServiceSpec : Spek({
                 }
 
                 it("should report error message") {
-                    coVerify { fetchRequestRepository.setError(any(), assert { "oops" in it }) }
+                    coVerify { fetchRequestRepository.setError(any(), match { "oops" in it }) }
                 }
 
                 it("should report url in error message") {
-                    coVerify { fetchRequestRepository.setError(any(), assert { "url-to-fetch.net" in it }) }
+                    coVerify { fetchRequestRepository.setError(any(), match { "url-to-fetch.net" in it }) }
                 }
 
                 it("should set the request status to error AFTER setting it to progress") {

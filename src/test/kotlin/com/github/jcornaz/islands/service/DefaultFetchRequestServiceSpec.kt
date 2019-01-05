@@ -34,7 +34,7 @@ class DefaultFetchRequestServiceSpec : Spek({
 
         it("should create the request") {
             coVerify(exactly = 1) {
-                repository.create(coAssert { it === request })
+                repository.create(match { it === request })
             }
         }
 

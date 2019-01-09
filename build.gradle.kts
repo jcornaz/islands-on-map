@@ -7,9 +7,10 @@ import org.unbrokendome.gradle.plugins.testsets.dsl.testSets
 plugins {
     idea
     kotlin("jvm") version Version.KOTLIN
-    id("com.github.ben-manes.versions") version "0.20.0"
     id("com.google.protobuf") version "0.8.7"
     id("org.unbroken-dome.test-sets") version "2.0.3"
+    id("com.github.ben-manes.versions") version "0.20.0"
+    id("se.patrikerdes.use-latest-versions") version "0.2.7"
 }
 
 group = "com.github.jcornaz"

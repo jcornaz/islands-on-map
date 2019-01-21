@@ -8,7 +8,7 @@ plugins {
     idea
     kotlin("jvm") version Version.KOTLIN
     id("com.github.ben-manes.versions") version "0.20.0"
-    id("com.google.protobuf") version "0.8.7"
+    id("com.google.protobuf") version "0.8.8"
     id("org.unbroken-dome.test-sets") version "2.1.1"
 }
 
@@ -26,20 +26,11 @@ repositories {
 @Suppress("UNUSED_VARIABLE")
 testSets {
     val testUtil by creating(TestLibrary::class)
-
     val integrationTestUtil by creating(TestLibrary::class)
 
-    val unitTest by getting {
-        imports(testUtil)
-    }
-
-    val integrationTest by creating {
-        imports(testUtil, integrationTestUtil)
-    }
-
-    val acceptanceTest by creating {
-        imports(testUtil, integrationTestUtil)
-    }
+    val unitTest by getting { imports(testUtil) }
+    val integrationTest by creating { imports(testUtil, integrationTestUtil) }
+    val acceptanceTest by creating { imports(testUtil, integrationTestUtil) }
 }
 
 dependencies {

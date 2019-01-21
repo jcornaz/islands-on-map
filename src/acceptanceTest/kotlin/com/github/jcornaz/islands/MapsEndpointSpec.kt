@@ -15,9 +15,11 @@ import java.util.*
 
 class MapsEndpointSpec : Spek({
     val database by memoizedClosable(CachingMode.SCOPE) { TestDatabase() }
-    val application by memoizedClosable(CachingMode.GROUP) { TestApplication(database.driver) }
+    val application by memoizedClosable { TestApplication(database.url) }
 
-    afterEachTest { database.clear() }
+    afterEachTest {
+        database.clear()
+    }
 
     describe("create map") {
         val inputMap = CreateTileMapRequest.newBuilder()

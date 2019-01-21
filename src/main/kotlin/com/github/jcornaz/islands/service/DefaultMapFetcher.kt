@@ -3,15 +3,15 @@ package com.github.jcornaz.islands.service
 import com.github.jcornaz.islands.CreateTileMapRequest
 import com.github.jcornaz.islands.FetchRequest
 import com.github.jcornaz.islands.persistence.FetchRequestRepository
-import com.github.jcornaz.islands.persistence.TileRepository
+import com.github.jcornaz.islands.persistence.TileRepositoryProvider
 import kotlinx.coroutines.channels.fold
 import java.util.*
 
-class DefaultFetchService(
+class DefaultMapFetcher(
     private val mapService: MapService,
     private val fetchRequestRepository: FetchRequestRepository,
-    private val getTileRepository: (url: String) -> TileRepository
-) : FetchService {
+    private val tileRepositoryProvider: TileRepositoryProvider
+) : MapFetcher {
     override suspend fun fetch(requestId: UUID) {
         val request = fetchRequestRepository.findById(requestId)
 
@@ -21,7 +21,7 @@ class DefaultFetchService(
 
         try {
             val map = mapService.create(
-                getTileRepository(request.url)
+                tileRepositoryProvider[request.url]
                     .findAll()
                     .fold(CreateTileMapRequest.newBuilder()) { builder, tile -> builder.addTile(tile) }
                     .build()

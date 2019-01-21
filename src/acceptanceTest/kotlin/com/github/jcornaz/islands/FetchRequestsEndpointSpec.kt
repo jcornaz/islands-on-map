@@ -15,10 +15,10 @@ import org.spekframework.spek2.style.specification.describe
 
 class FetchRequestEndpointSpec : Spek({
     val database by memoizedClosable(CachingMode.SCOPE) { TestDatabase() }
-    val application by memoized { TestApplication(database.driver) }
+    val application by memoizedClosable { TestApplication(database.url, REMOTE_URL to REMOTE_ANSWER) }
 
-    beforeEachTest {
-        application.remoteResources[REMOTE_URL] = REMOTE_ANSWER
+    afterEachTest {
+        database.clear()
     }
 
     describe("create valid fetch request") {

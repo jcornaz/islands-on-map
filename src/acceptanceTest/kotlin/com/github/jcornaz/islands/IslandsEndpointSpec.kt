@@ -11,9 +11,11 @@ import java.util.*
 
 class IslandsEndpointSpec : Spek({
     val database by memoizedClosable(CachingMode.SCOPE) { TestDatabase() }
-    val application by memoizedClosable { TestApplication(database.driver) }
+    val application by memoizedClosable { TestApplication(database.url) }
 
-    afterEachTest { database.clear() }
+    afterEachTest {
+        database.clear()
+    }
 
     describe("given 2 created maps") {
         lateinit var maps: List<TileMap>

@@ -1,17 +1,20 @@
 package com.github.jcornaz.islands.service
 
-import com.github.jcornaz.islands.*
+import com.github.jcornaz.islands.CreateTileMapRequest
+import com.github.jcornaz.islands.ResourceNotFoundException
+import com.github.jcornaz.islands.TileMap
+import com.github.jcornaz.islands.TileMapList
+import com.github.jcornaz.islands.domain.IslandDetector
 import com.github.jcornaz.islands.persistence.IslandRepository
 import com.github.jcornaz.islands.persistence.TileMapRepository
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.fold
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import java.util.*
 
 class DefaultMapService(
     private val mapRepository: TileMapRepository,
     private val islandRepository: IslandRepository,
-    private val detectIslands: (List<Tile>) -> Iterable<Set<Coordinate>>
+    private val islandDetector: IslandDetector
 ) : MapService {
 
     override suspend fun create(request: CreateTileMapRequest): TileMap {
@@ -24,18 +27,8 @@ class DefaultMapService(
 
         mapRepository.create(map)
 
-        coroutineScope {
-            detectIslands(map.tileList).forEach { coordinates ->
-                launch {
-                    islandRepository.create(
-                        Island.newBuilder()
-                            .setId(UUID.randomUUID().toString())
-                            .setMapId(map.id)
-                            .addAllCoordinate(coordinates)
-                            .build()
-                    )
-                }
-            }
+        islandDetector.detectIslands(map.tileList).consumeEach {
+            islandRepository.create(it)
         }
 
         return map

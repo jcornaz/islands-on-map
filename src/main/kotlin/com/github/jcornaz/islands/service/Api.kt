@@ -2,6 +2,7 @@ package com.github.jcornaz.islands.service
 
 import com.github.jcornaz.islands.*
 import kotlinx.coroutines.channels.ReceiveChannel
+import org.koin.dsl.module
 import java.util.*
 
 interface MapService {
@@ -22,6 +23,13 @@ interface FetchRequestService {
     fun openCreatedSubscription(): ReceiveChannel<FetchRequest>
 }
 
-interface FetchService {
+interface MapFetcher {
     suspend fun fetch(requestId: UUID)
+}
+
+val defaultServices = module {
+    single<MapService> { DefaultMapService(get(), get(), get()) }
+    single<IslandService> { DefaultIslandService(get()) }
+    single<FetchRequestService> { DefaultFetchRequestService(get()) }
+    single<MapFetcher> { DefaultMapFetcher(get(), get(), get()) }
 }

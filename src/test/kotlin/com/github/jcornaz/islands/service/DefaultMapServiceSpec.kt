@@ -1,10 +1,12 @@
 package com.github.jcornaz.islands.service
 
 import com.github.jcornaz.islands.*
+import com.github.jcornaz.islands.domain.IslandDetector
 import com.github.jcornaz.islands.persistence.IslandRepository
 import com.github.jcornaz.islands.persistence.TileMapRepository
 import com.github.jcornaz.islands.test.*
 import com.github.jcornaz.miop.produce
+import com.github.jcornaz.miop.receiveChannelOf
 import io.mockk.Ordering
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -21,9 +23,9 @@ class DefaultMapServiceSpec : Spek({
 
     val mapRepository: TileMapRepository by memoizedMock(relaxed = true)
     val islandRepository: IslandRepository by memoizedMock(relaxed = true)
-    val islandDetection: (Iterable<Tile>) -> Collection<Set<Coordinate>> by memoizedMock()
+    val islandDetector: IslandDetector by memoizedMock()
 
-    val service: MapService by memoized { DefaultMapService(mapRepository, islandRepository, islandDetection) }
+    val service: MapService by memoized { DefaultMapService(mapRepository, islandRepository, islandDetector) }
 
     describe("given mapRepository.findById(UUID) returns a map") {
         val id = UUID(0L, 1L)
@@ -106,7 +108,12 @@ class DefaultMapServiceSpec : Spek({
         )
 
         beforeEachBlocking {
-            coEvery { islandDetection(eq(tiles)) } returns listOf(setOf(coordinate(0, 1)), setOf(coordinate(1, 0)))
+            coEvery { islandDetector.detectIslands(eq(tiles)) } answers {
+                receiveChannelOf(
+                    Island.newBuilder().setId(UUID(0L, 1L).toString()).addCoordinate(coordinate(0, 1)).build(),
+                    Island.newBuilder().setId(UUID(0L, 2L).toString()).addCoordinate(coordinate(1, 0)).build()
+                )
+            }
 
             service.create(CreateTileMapRequest.newBuilder().addAllTile(tiles).build())
         }

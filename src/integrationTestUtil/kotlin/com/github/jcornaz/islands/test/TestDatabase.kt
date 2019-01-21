@@ -1,6 +1,7 @@
 package com.github.jcornaz.islands.test
 
-import com.github.jcornaz.islands.persistence.createConstaints
+import com.github.jcornaz.islands.persistence.createConstraints
+import io.ktor.http.Url
 import org.neo4j.driver.v1.Driver
 import org.neo4j.driver.v1.GraphDatabase
 import org.neo4j.driver.v1.Record
@@ -11,11 +12,12 @@ import java.io.File
 class TestDatabase : Closeable {
     private val service = TestServerBuilders.newInProcessBuilder(File("build/tmp/db")).newServer()
 
+    val url: Url get() = Url(service.boltURI().toString())
     val driver: Driver = GraphDatabase.driver(service.boltURI())
 
     init {
         try {
-            driver.createConstaints()
+            driver.createConstraints()
         } catch (t: Throwable) {
             close()
             throw t

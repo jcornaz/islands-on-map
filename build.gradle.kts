@@ -9,7 +9,7 @@ plugins {
     kotlin("jvm") version Version.KOTLIN
     id("com.github.ben-manes.versions") version "0.20.0"
     id("com.google.protobuf") version "0.8.7"
-    id("org.unbroken-dome.test-sets") version "2.0.3"
+    id("org.unbroken-dome.test-sets") version "2.1.1"
 }
 
 group = "com.github.jcornaz"
@@ -23,9 +23,23 @@ repositories {
     maven { url = uri("https://jitpack.io") }
 }
 
+@Suppress("UNUSED_VARIABLE")
 testSets {
-    val integration = create("integrationTest")
-    create("acceptanceTest") { extendsFrom(integration) }
+    val testUtil by creating(TestLibrary::class)
+
+    val integrationTestUtil by creating(TestLibrary::class)
+
+    val unitTest by getting {
+        imports(testUtil)
+    }
+
+    val integrationTest by creating {
+        imports(testUtil, integrationTestUtil)
+    }
+
+    val acceptanceTest by creating {
+        imports(testUtil, integrationTestUtil)
+    }
 }
 
 dependencies {
@@ -39,28 +53,29 @@ dependencies {
     implementation("io.ktor:ktor-client-gson:${Version.KTOR}")
     implementation("io.ktor:ktor-client-apache:${Version.KTOR}")
 
+    implementation("org.koin:koin-ktor:${Version.KOIN}")
+    implementation("org.koin:koin-logger-slf4j:${Version.KOIN}")
+
     implementation("com.google.protobuf:protobuf-java:${Version.PROTOBUF}")
-
     implementation("org.neo4j.driver:neo4j-java-driver:${Version.NEO4J_DRIVER}")
-
     implementation("org.slf4j:slf4j-simple:${Version.SLF4J_SIMPLE}")
 
-    testApi("org.jetbrains.kotlin:kotlin-test:${Version.KOTLIN}")
-    testApi("org.spekframework.spek2:spek-dsl-jvm:${Version.SPEK}")
-    testApi("org.amshove.kluent:kluent:${Version.KLUENT}")
-    testApi("io.mockk:mockk:${Version.MOCKK}")
-    testApi("com.github.jcornaz.miop:miop-jvm:${Version.MIOP}")
-    testApi("io.ktor:ktor-client-mock-jvm:${Version.KTOR}")
+    add("testUtilApi", sourceSets["main"].compileClasspath)
+    add("testUtilApi", "org.jetbrains.kotlin:kotlin-test:${Version.KOTLIN}")
+    add("testUtilApi", "org.spekframework.spek2:spek-dsl-jvm:${Version.SPEK}")
+    add("testUtilApi", "org.amshove.kluent:kluent:${Version.KLUENT}")
+    add("testUtilApi", "io.mockk:mockk:${Version.MOCKK}")
 
+    testApi("io.ktor:ktor-client-mock-jvm:${Version.KTOR}")
+    testApi("com.github.jcornaz.miop:miop-jvm:${Version.MIOP}")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:${Version.SPEK}")
 
-    add("integrationTestImplementation", sourceSets["test"].output)
-    add("integrationTestImplementation", "org.neo4j:neo4j:${Version.NEO4J}")
-    add("integrationTestImplementation", "org.neo4j.test:neo4j-harness:${Version.NEO4J}")
+    add("integrationTestUtilApi", sourceSets["main"].compileClasspath)
+    add("integrationTestUtilApi", "org.neo4j:neo4j:${Version.NEO4J}")
+    add("integrationTestUtilApi", "org.neo4j.test:neo4j-harness:${Version.NEO4J}")
 
-    add("acceptanceTestImplementation", sourceSets["test"].output)
-    add("acceptanceTestImplementation", sourceSets["integrationTest"].output)
     add("acceptanceTestImplementation", "io.ktor:ktor-server-test-host:${Version.KTOR}")
+    add("acceptanceTestImplementation", "org.koin:koin-test:${Version.KOIN}")
 }
 
 tasks {

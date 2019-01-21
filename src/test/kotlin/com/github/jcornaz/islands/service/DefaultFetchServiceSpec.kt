@@ -5,6 +5,7 @@ import com.github.jcornaz.islands.TileMap
 import com.github.jcornaz.islands.TileType
 import com.github.jcornaz.islands.persistence.FetchRequestRepository
 import com.github.jcornaz.islands.persistence.TileRepository
+import com.github.jcornaz.islands.persistence.TileRepositoryProvider
 import com.github.jcornaz.islands.test.beforeEachBlocking
 import com.github.jcornaz.islands.test.memoizedMock
 import com.github.jcornaz.islands.test.tile
@@ -19,9 +20,9 @@ import java.util.*
 class DefaultFetchServiceSpec : Spek({
     val mapService: MapService by memoizedMock()
     val fetchRequestRepository: FetchRequestRepository by memoizedMock(relaxed = true)
-    val tileRepositoryProvider: (url: String) -> TileRepository by memoizedMock()
+    val tileRepositoryProvider: TileRepositoryProvider by memoizedMock()
 
-    val service: FetchService by memoized { DefaultFetchService(mapService, fetchRequestRepository, tileRepositoryProvider) }
+    val service: MapFetcher by memoized { DefaultMapFetcher(mapService, fetchRequestRepository, tileRepositoryProvider) }
 
     describe("given an existing pending fetch-request") {
         val id = UUID(0L, 1L)
@@ -51,7 +52,7 @@ class DefaultFetchServiceSpec : Spek({
                     every { findAll() } answers { GlobalScope.produce(tiles) }
                 }
 
-                every { tileRepositoryProvider(eq("url-to-fetch.net")) } returns tileRepository
+                every { tileRepositoryProvider[eq("url-to-fetch.net")] } returns tileRepository
                 coEvery { mapService.create(match { it.tileList.toSet() == tiles }) } returns TileMap.newBuilder().setId(mapId.toString()).addAllTile(tiles).build()
             }
 
@@ -88,7 +89,7 @@ class DefaultFetchServiceSpec : Spek({
         describe("given the tile repository throw an error") {
 
             beforeEach {
-                every { tileRepositoryProvider.invoke(eq("url-to-fetch.net")) } throws Exception("oops")
+                every { tileRepositoryProvider[eq("url-to-fetch.net")] } throws Exception("oops")
                 coEvery { fetchRequestRepository.setError(eq(id), eq("oops")) } returns Unit
             }
 

@@ -5,6 +5,20 @@ I found this interesting and decided to do the same task from scratch as a small
 
 However, as I'm not applying for the job position, I can change the points of the tasks I don't like. For instance I'll go for [Ktor](https://github.com/ktorio/ktor) instead of SpringBoot.
 
+### Status
+This project is discontinued and I will no longer work on it.
+
+**Here are the two main reasons:**
+
+1. After working on it a little bit I realized how bad was the assignement:
+    1. It lacks use-case. I had a hard time to guess or invent (even an imaginary) motivation for such service. Therefore it is very hard to end up with good design and good tests, since it is not possible to use BDD and be use-case oriented.
+    2. Requested API is not RESTful, and it is hard to make it a good fit for a REST service while keeping the task interesting. (RPC would have been slightly better, but again I lack relevant use-case in order to be able to create a good design)
+2. Besides theses problems, I also lost interest for the task. Somehow the problem is "solved" for me.
+    1. I provided the main endpoints
+    2. I experimented what I wanted with Ktor, Protobuf, Neo4J and Spek.
+    3. I wrote the island dectection algorith, which is the only "complex" part. It pass the tests and I don't see how, nor have interest to improve it.
+    4. My time is limited, and I have more interesting project/challenges to work on.
+
 ### Assignment
 #### Concept
 A *map* is a a collection of *tiles*
